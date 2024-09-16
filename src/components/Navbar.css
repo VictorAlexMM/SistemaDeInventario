@@ -1,0 +1,33 @@
+/* src/components/NavBar.css */
+
+.navbar {
+    display: flex;
+    justify-content: center; /* Centraliza o conteúdo horizontalmente */
+    align-items: center; /* Centraliza o conteúdo verticalmente */
+    background-color: #333;
+    width: 100%; /* Ocupa toda a largura da tela */
+    padding: 10px 0; /* Espaçamento superior e inferior */
+    box-sizing: border-box; /* Inclui o padding na largura total */
+  }
+  
+  .navbar-container {
+    display: flex;
+    justify-content: space-around; /* Espaça os itens igualmente */
+    align-items: center;
+    width: 100%; /* Ocupa toda a largura disponível */
+    max-width: 1200px; /* Limita a largura máxima para um layout mais controlado */
+  }
+  
+  .navbar a {
+    color: white;
+    text-decoration: none;
+    padding: 10px 20px; /* Espaçamento interno dos links */
+    display: block; /* Garante que o padding seja aplicado corretamente */
+    text-align: center; /* Centraliza o texto dentro do link */
+  }
+  
+  .navbar a:hover {
+    background-color: #555;
+    border-radius: 4px;
+  }
+  

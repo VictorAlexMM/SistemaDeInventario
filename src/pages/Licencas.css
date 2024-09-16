@@ -1,0 +1,108 @@
+/* Licencas.css */
+
+/* Container para o formulário */
+.popup-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+}
+
+.popup-form {
+  background-color: #333;
+  padding: 15px; /* Reduzido o padding */
+  border-radius: 5px;
+  max-width: 90%; /* Ajustado para ser responsivo */
+  width: 400px; /* Define uma largura fixa mais estreita */
+  box-sizing: border-box;
+}
+
+/* Estilo do formulário */
+.popup-form form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px; /* Espaçamento reduzido entre os inputs */
+}
+
+/* Estilo dos inputs */
+.popup-form input[type="text"],
+.popup-form input[type="number"],
+.popup-form input[type="date"],
+.popup-form input[type="file"] {
+  padding: 8px; /* Ajustado para menos padding */
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  box-sizing: border-box;
+  width: 100%; /* Ocupa toda a largura disponível */
+}
+
+/* Estilo dos botões no formulário */
+.form-buttons {
+  display: flex;
+  gap: 8px; /* Espaçamento reduzido entre botões */
+  margin-top: 10px;
+}
+
+.form-buttons button {
+  padding: 8px 16px; /* Reduzido o padding dos botões */
+  border: none;
+  border-radius: 4px;
+  background-color: #007bff;
+  color: white;
+  cursor: pointer;
+  font-size: 14px; /* Ajustado o tamanho da fonte dos botões */
+}
+
+.form-buttons button:hover {
+  background-color: #0056b3;
+}
+
+.form-buttons button[type="button"] {
+  background-color: #6c757d;
+}
+
+.form-buttons button[type="button"]:hover {
+  background-color: #5a6268;
+}
+
+/* Estilo da tabela */
+.licencas-container {
+  padding: 10px; /* Reduzido o padding da container da tabela */
+}
+
+.licencas-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.licencas-table th,
+.licencas-table td {
+  padding: 6px; /* Reduzido o padding das células da tabela */
+  border: 1px solid #ddd; /* Ajustado a cor da borda para mais suave */
+}
+
+.licencas-table th {
+  background-color: #333;
+  color: white; /* Adicionado cor para o texto */
+}
+
+/* Estilo do botão de adicionar */
+.add-button {
+  padding: 8px; /* Reduzido o padding */
+  border: none;
+  border-radius: 4px;
+  background-color: #28a745;
+  color: white;
+  cursor: pointer;
+  font-size: 14px; /* Ajustado o tamanho da fonte */
+}
+
+.add-button:hover {
+  background-color: #218838;
+}

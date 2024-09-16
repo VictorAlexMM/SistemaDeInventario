@@ -1,0 +1,46 @@
+/* src/pages/Comodato.css */
+
+.comodato-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    background-color: #f4f4f4; /* Cor de fundo leve para contraste */
+    font-family: Arial, sans-serif;
+    margin: 0;
+  }
+  
+  h1 {
+    font-size: 2em;
+    color: #333;
+    margin-bottom: 20px;
+  }
+  
+  .comodato-content {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    max-width: 800px;
+    width: 100%;
+  }
+  
+  h2 {
+    font-size: 1.5em;
+    color: #333;
+    margin-top: 20px;
+  }
+  
+  p {
+    font-size: 1em;
+    color: #555;
+    line-height: 1.6;
+    margin-bottom: 15px;
+  }
+  
+  .footer-text {
+    font-weight: bold;
+    margin-top: 20px;
+  }
+  

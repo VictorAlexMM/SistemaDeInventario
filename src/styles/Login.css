@@ -1,0 +1,74 @@
+/* src/styles/Login.css */
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: Arial, sans-serif;
+}
+
+.login-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-color: #333; /* Fundo cinza escuro */
+  color: #fff; /* Texto branco */
+  flex-direction: column;
+}
+
+.login-form {
+  background: #444; /* Fundo do formulário em um tom mais claro de cinza */
+  padding: 20px;
+  border-radius: 8px;
+  width: 100%;
+  max-width: 400px; /* Limita a largura do formulário */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5); /* Sombra para dar profundidade */
+  text-align: center; /* Centraliza o texto do título e o conteúdo do formulário */
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* Alinha itens no centro horizontalmente */
+}
+
+.login-title {
+  margin-bottom: 20px; /* Espaçamento abaixo do título */
+  font-size: 2em;
+  padding: 10px;
+}
+
+.login-label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: bold;
+  text-align: left; /* Alinha os rótulos à esquerda dentro do formulário */
+  width: 100%; /* Faz com que os rótulos ocupem toda a largura do formulário */
+}
+
+.login-input {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 15px;
+  border: 1px solid #555; /* Borda sutil para os campos de entrada */
+  border-radius: 5px;
+  background-color: #555; /* Fundo dos campos de entrada em um tom mais escuro de cinza */
+  color: #fff; /* Texto branco nos campos de entrada */
+}
+
+.login-input::placeholder {
+  color: #aaa; /* Cor do texto do placeholder */
+}
+
+.login-button {
+  width: 100%;
+  padding: 10px;
+  border: none;
+  border-radius: 5px;
+  background-color: #007bff; /* Cor azul para o botão */
+  color: #fff; /* Texto branco no botão */
+  font-size: 1em;
+  cursor: pointer;
+  transition: background-color 0.3s; /* Transição suave para a cor de fundo */
+}
+
+.login-button:hover {
+  background-color: #0056b3; /* Azul mais escuro ao passar o mouse sobre o botão */
+}

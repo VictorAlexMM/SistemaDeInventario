@@ -1,0 +1,351 @@
+.container {
+  font-family: Arial, sans-serif;
+  margin: 20px;
+}
+
+h1 {
+  color: #ffffff;
+  margin-bottom: 10px;
+}
+
+.form-buttons {
+  display: flex; /* Usar flexbox para alinhar os botões */
+  gap: 10px; /* Espaçamento entre os botões */
+  margin-bottom: 20px; /* Espaçamento abaixo dos botões */
+}
+
+.button-import,
+.button-export,
+.button-add {
+  background-color: #007bff;
+  color: rgb(255, 0, 0);
+  border: none;
+  padding: 10px 15px;
+  margin-right: 10px;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+.button-import {
+  background-color: #28a745;
+}
+
+.button-export {
+  background-color: #ffc107;
+}
+
+.button-add {
+  background-color: #007bff;
+}
+
+.button-add {
+  background-color: #007bff;
+}
+
+.button-edit {
+  background-color: #17a2b8;
+  color: white;
+  border: none;
+  padding: 5px;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+.button-collapsible {
+  background-color: #6c757d;
+  color: rgb(255, 255, 255);
+  border: none;
+  padding: 5px;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+.button-submit,
+.button-cancel {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  margin-right: 10px;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+.button-cancel {
+  background-color: #dc3545;
+}
+
+.table-container {
+  margin-top: 20px;
+  background-color: #a89f9f64;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th, td {
+  border: 1px solid #000000;
+  padding: 8px;
+  text-align: left;
+}
+
+th {
+  background-color: #f2f2f2;
+}
+
+.form-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.modal-content {
+  background: transparent;
+  padding: 20px;
+  border-radius: 8px;
+  max-width: 1200px;
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.close-button {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  cursor: pointer;
+}
+
+.form-modal form {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+label {
+  flex: 1;
+  min-width: 150px;
+  margin-right: 20px;
+  margin-bottom: 10px;
+}
+
+input[type="text"],
+input[type="number"],
+input[type="date"],
+input[type="file"] {
+  width: calc(100% - 22px);
+  padding: 8px;
+  margin-top: 5px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+input[type="checkbox"] {
+  margin-right: 10px;
+}
+
+.collapsible-content {
+  padding: 10px;
+  background: #3333;
+}
+
+/* Estilo geral do popup */
+/* Estilo para o modal de adicionar/editar */
+.add-edit-form-modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: #fff; /* Branco para o fundo do modal */
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  width: 90%;
+  max-width: 900px; /* Ajuste o tamanho conforme necessário */
+  display: flex;
+  flex-direction: column;
+}
+
+/* Estilo para o fundo escurecido atrás do modal */
+.add-edit-form-modal::before {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.3); /* Fundo escurecido */
+  z-index: -1;
+}
+
+/* Estilo para o formulário dentro do modal */
+.add-edit-form-modal form {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr); /* 4 colunas */
+  gap: 15px; /* Espaçamento entre os campos */
+  width: 100%;
+  max-width: 100%;
+}
+
+/* Estilo para os labels */
+.add-edit-form-modal label {
+  display: flex;
+  flex-direction: column;
+  font-size: 14px;
+  margin-bottom: 10px;
+}
+
+/* Estilo para os inputs */
+.add-edit-form-modal input[type="text"],
+.add-edit-form-modal input[type="number"],
+.add-edit-form-modal input[type="date"],
+.add-edit-form-modal input[type="file"],
+.add-edit-form-modal select {
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  width: 100%; /* Ocupa 100% da largura da coluna */
+  box-sizing: border-box; /* Inclui padding e border no width total */
+}
+
+/* Estilo para o botão de enviar */
+.add-edit-form-modal button.submit {
+  background-color: #28a745;
+  color: #fff;
+  padding: 10px 15px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.add-edit-form-modal button.submit:hover {
+  background-color: #218838;
+}
+
+/* Estilo para o botão de cancelar */
+.add-edit-form-modal button.cancel {
+  background-color: #dc3545;
+  color: #fff;
+  padding: 10px 15px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.add-edit-form-modal button.cancel:hover {
+  background-color: #c82333;
+}
+
+/* Container para os botões dentro do modal */
+.add-edit-form-modal .button-container {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+/* Estilo para o modal de importação CSV */
+.import-csv-modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: #f9f9f9; /* Cinza claro para o fundo do modal */
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  width: 90%;
+  max-width: 500px; /* Ajuste o tamanho conforme necessário */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Estilo para o fundo escurecido atrás do modal */
+.import-csv-modal::before {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.3); /* Fundo escurecido */
+  z-index: -1;
+}
+
+/* Estilo para o formulário dentro do modal */
+.import-csv-modal form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  width: 100%;
+  max-width: 400px;
+}
+
+/* Estilo para os inputs */
+.import-csv-modal input[type="file"] {
+  padding: 8px;
+  font-size: 16px;
+}
+
+/* Estilo para os botões */
+.import-csv-modal button {
+  padding: 8px 12px;
+  font-size: 14px;
+  color: #fff;
+  background-color: #333;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  margin: 5px;
+}
+
+.import-csv-modal button:hover {
+  background-color: #0056b3;
+}
+
+/* Estilo específico para o botão de cancelar */
+.import-csv-modal button.cancel {
+  background-color: #6c757d;
+}
+
+.import-csv-modal button.cancel:hover {
+  background-color: #5a6268;
+}
+
+/* Estilo para o botão de baixar exemplo CSV */
+.import-csv-modal button.download-example {
+  background-color: #28a745;
+}
+
+.import-csv-modal button.download-example:hover {
+  background-color: #218838;
+}
+.search-container {
+  margin-bottom: 10px; /* Reduzido a margem inferior */
+}
+
+.search-container label {
+  font-weight:bold;
+  font-size: 16px;
+}
+
+.search-container input {
+  margin-left: 5px; /* Reduzido o espaço à esquerda do input */
+  padding: 3px; /* Reduzido o preenchimento interno */
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 16px;
+}

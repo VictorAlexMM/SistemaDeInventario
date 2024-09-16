@@ -1,0 +1,39 @@
+/* src/pages/Home.css */
+
+/* Ajusta o container para garantir que os itens sejam alinhados no topo da página */
+.home-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start; /* Alinha itens ao topo */
+    min-height: 100vh; /* Garante que o container ocupe toda a altura da tela */
+    padding: 20px; /* Ajuste conforme necessário */
+    box-sizing: border-box; /* Inclui padding e border no cálculo da largura e altura */
+    background-color: #333; /* Cor de fundo da página */
+}
+
+/* Ajusta o título */
+.home-title {
+    font-size: 2em; /* Ajustado para 2em */
+    color: #ffffff; /* Cor do texto */
+    margin: 0 0 10px 0; /* Remove margem superior e inferior, apenas margem inferior de 10px */
+}
+
+/* Ajusta os botões */
+.home-buttons {
+    display: flex;
+    flex-direction:row; /* Alinha os botões em uma coluna para melhor disposição */
+    gap: 15px; /* Espaçamento entre os botões */
+    margin-top: 20px; /* Espaçamento superior para separar do título */
+}
+
+/* Ajusta o estilo dos botões */
+.home-button {
+    padding: 8px 16px; /* Ajustado para 8px 16px */
+    font-size: 1em; /* Ajustado para 1em */
+    border: none;
+    border-radius: 4px; /* Ajustado para 4px */
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+}
+

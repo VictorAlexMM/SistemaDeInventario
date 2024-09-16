@@ -1,0 +1,29 @@
+/* src/styles/App.css */
+
+/* Reset de margens e preenchimentos padrões para evitar problemas de layout */
+body, html {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  width: 100%;
+  background: #333; /* Altere para branco ou qualquer cor desejada para o fundo da página */
+}
+
+/* Inclui padding e border no cálculo da largura e altura */
+* {
+  box-sizing: border-box;
+}
+
+.app-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh; /* Garante que o container ocupe toda a altura da tela */
+  margin: 0;
+}
+
+.content-container {
+  flex: 1; /* Faz com que este container ocupe o espaço restante disponível */
+  box-sizing: border-box; /* Inclui padding e border no cálculo da largura e altura */
+  padding: 0; /* Remover padding se não for necessário */
+  margin: 0; /* Remover margin se não for necessário */
+}

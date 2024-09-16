@@ -1,24 +1,40 @@
-import logo from './logo.svg';
-import './App.css';
+// src/App.js
+import React from 'react';
+import { BrowserRouter as Router, Route, Routes, useLocation } from 'react-router-dom';
+import NavBar from './components/NavBar';
+import Login from './pages/Login';
+import Home from './pages/Home';
+import Licencas from './pages/Licencas';
+import Estoque from './pages/Estoque';
+import Comodato from './pages/Comodato';
+import './styles/App.css';
+
+const Layout = ({ children }) => {
+  const location = useLocation();
+  const isLoginPage = location.pathname === '/';
+  const isComodatoPage = location.pathname === '/comodato';
+
+  return (
+    <div className="app-container">
+      {!isLoginPage && !isComodatoPage && <NavBar />}
+      <div className="content-container">
+        {children}
+      </div>
+    </div>
+  );
+};
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Router>
+      <Routes>
+        <Route path="/" element={<Layout><Login /></Layout>} />
+        <Route path="/Home" element={<Layout><Home /></Layout>} />
+        <Route path="/licencas" element={<Layout><Licencas /></Layout>} />
+        <Route path="/inventario" element={<Layout><Estoque /></Layout>} />
+        <Route path="/comodato" element={<Layout><Comodato /></Layout>} />
+      </Routes>
+    </Router>
   );
 }
 
