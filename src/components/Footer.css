@@ -1,0 +1,16 @@
+/* src/components/Footer.css */
+
+.footer {
+    position: fixed; /* Fixa o footer no fundo da tela */
+    bottom: 0; /* Posiciona o footer na parte inferior da tela */
+    left: 0; /* Alinha o footer à esquerda */
+    width: 100%; /* Faz o footer ocupar toda a largura da tela */
+    background-color: #333; /* Cor de fundo do footer */
+    color: #fff; /* Cor do texto */
+    text-align: center; /* Centraliza o texto */
+    padding: 5px 0; /* Pequeno padding superior e inferior */
+    box-sizing: border-box; /* Inclui padding e border no cálculo da largura */
+    font-size: 0.8em; /* Tamanho da fonte reduzido para um footer pequeno */
+    z-index: 1000; /* Garante que o footer fique acima de outros elementos */
+  }
+  

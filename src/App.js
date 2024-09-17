@@ -2,6 +2,7 @@
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes, useLocation } from 'react-router-dom';
 import NavBar from './components/NavBar';
+import Footer from './components/Footer'; // Importe o Footer
 import Login from './pages/Login';
 import Home from './pages/Home';
 import Licencas from './pages/Licencas';
@@ -9,6 +10,7 @@ import Estoque from './pages/Estoque';
 import Comodato from './pages/Comodato';
 import './styles/App.css';
 
+// Componente Layout para adicionar NavBar e Footer
 const Layout = ({ children }) => {
   const location = useLocation();
   const isLoginPage = location.pathname === '/';
@@ -16,10 +18,13 @@ const Layout = ({ children }) => {
 
   return (
     <div className="app-container">
+      {/* Condicionalmente renderiza a NavBar se não estiver na página de login ou comodato */}
       {!isLoginPage && !isComodatoPage && <NavBar />}
       <div className="content-container">
         {children}
       </div>
+      {/* Footer está sempre presente */}
+      <Footer />
     </div>
   );
 };
