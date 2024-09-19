@@ -11,8 +11,8 @@ function Home() {
     <div className="home-container">
       <h1 className="home-title">Home</h1>
       <div className="home-buttons">
-        <button className="home-button home-button--licencas" onClick={() => navigate('/licencas')}>Licenças</button>
-        <button className="home-button home-button--inventario" onClick={() => navigate('/inventario')}>Inventário</button>
+        <button className="home-button home-button--licencas" onClick={() => navigate('/portal/licencas')}>Licenças</button>
+        <button className="home-button home-button--inventario" onClick={() => navigate('/portal/inventario')}>Inventário</button>
       </div>
     </div>
   );

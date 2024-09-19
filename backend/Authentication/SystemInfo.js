@@ -7,7 +7,7 @@ function SystemInfo() {
   useEffect(() => {
     const fetchInfo = async () => {
       try {
-        const response = await axios.get('http://localhost:3001/api/system-info');
+        const response = await axios.get('http://mao-s038:3001/api/system-info');
         setInfo(response.data.log);
       } catch (error) {
         console.error('Error fetching system info:', error);

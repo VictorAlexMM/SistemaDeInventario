@@ -1,0 +1,23 @@
+.footer {
+  padding: 5px; /* Padding superior e inferior */
+  margin: 0; /* Remove a margem esquerda fixa */
+  width: 100%; /* Faz o footer ocupar toda a largura da tela */
+  text-align: center; /* Centraliza o texto */
+  background-color: #333; /* Cor de fundo do footer */
+  color: #fff; /* Cor do texto */
+}
+
+/* Estilos responsivos */
+@media (max-width: 600px) {
+  .footer {
+    font-size: 0.7em; /* Diminui o tamanho da fonte em telas menores */
+    padding: 10px; /* Aumenta o padding para melhorar a aparência */
+  }
+}
+
+@media (min-width: 1200px) {
+  .footer {
+    font-size: 0.9em; /* Aumenta o tamanho da fonte em telas maiores */
+    padding: 8px; /* Ajusta o padding para telas maiores */
+  }
+}

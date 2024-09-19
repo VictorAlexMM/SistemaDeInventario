@@ -17,7 +17,7 @@ const Comodato = () => {
     const fetchSystemInfo = async () => {
       try {
         // Ajuste a URL para o endpoint correto
-        const response = await fetch('http://localhost:3001/api/system-info');
+        const response = await fetch('http://mao-s38:3001/api/system-info');
         
         // Verifique se a resposta é válida
         if (!response.ok) {

@@ -11,7 +11,9 @@ function Estoque() {
   const [estoque, setEstoque] = useState([]);
   const [isAdding, setIsAdding] = useState(false);
   const [isImporting, setIsImporting] = useState(false);
+  const [isExporting, setIsExporting] = useState(false);
   const [editingIndex, setEditingIndex] = useState(null);
+  const [downloadOption, setDownloadOption] = useState('completo');
   const [newEstoque, setNewEstoque] = useState({
     patrimonio: '',
     empresa: '',
@@ -72,7 +74,21 @@ function Estoque() {
       return 0;
     });
   };
+  const downloadByPeriod = () => {
+    // Lógica para exportar o CSV por período
+    alert('Exportando CSV por período (implementação necessária).');
+    // Aqui você pode incluir a lógica de geração e download do CSV por período
+  }; 
 
+  const handleDownload = () => {
+    if (downloadOption === 'completo') {
+      downloadFilledCSV(); // Chama a função para exportar CSV completo
+    } else {
+      downloadByPeriod(); // Chama a função para exportar CSV por período
+    }
+    setIsExporting(false); // Fecha o popup após o download
+  };
+  
   const sortedData = React.useMemo(() => {
     let sortableItems = [...filteredEstoque];
     sortableItems.sort((a, b) => {
@@ -784,6 +800,23 @@ function Estoque() {
     </form>
     </div>
    )}
+
+      {isExporting && (
+        <div className="export-popup">
+          <h2>Exportar CSV</h2>
+          <label>
+            <select onChange={(e) => setDownloadOption(e.target.value)} value={downloadOption}>
+              <option value="completo">CSV Completo</option>
+              <option value="periodo">CSV por Período</option>
+            </select>
+          </label>
+          <div className="button-container">
+            <button onClick={handleDownload}>Baixar</button>
+            <button onClick={() => setIsExporting(false)}>Cancelar</button>
+          </div>
+        </div>
+      )}
+
 
       {/* Importação CSV */}
       {isImporting && (

@@ -6,10 +6,10 @@ import '../components/Navbar.css'; // Corrija o nome do arquivo aqui se necessá
 const NavBar = () => {
   return (
     <nav className="navbar">
-      <Link to="/home">Home</Link>
-      <Link to="/licencas">Licenças</Link>
-      <Link to="/inventario">Inventário</Link>
-      <Link to="/comodato">Comodato</Link>
+      <Link to="/portal/home">Home</Link>
+      <Link to="/portal/licencas">Licenças</Link>
+      <Link to="/portal/inventario">Inventário</Link>
+      <Link to="/portal/comodato">Comodato</Link>
     </nav>
   );
 };

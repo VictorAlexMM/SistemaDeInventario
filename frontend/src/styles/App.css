@@ -1,0 +1,43 @@
+/* Reset de margens e preenchimentos padrões para evitar problemas de layout */
+body, html {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  width: 100%;
+  background: #f4f4f4; /* Cor de fundo leve */
+}
+
+* {
+  box-sizing: border-box; /* Inclui padding e border no cálculo da largura e altura */
+}
+
+.app-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh; /* Garante que o container ocupe toda a altura da tela */
+}
+
+.content-container {
+  flex: 1; /* Faz com que este container ocupe o espaço restante disponível */
+  padding: 20px; /* Ajuste conforme necessário */
+  padding-bottom: 60px; /* Espaço para o footer */
+  background: #333; /* Cor de fundo do content-container */
+  color: #fff; /* Cor do texto para contraste */
+}
+
+/* Estilos responsivos */
+@media (max-width: 768px) {
+  .content-container {
+    padding: 15px; /* Reduz padding em telas menores */
+  }
+}
+
+@media (max-width: 480px) {
+  .content-container {
+    padding: 10px; /* Aumenta a responsividade em telas muito pequenas */
+  }
+
+  body, html {
+    background: #f4f4f4; /* Mantém cor de fundo leve em telas pequenas */
+  }
+}

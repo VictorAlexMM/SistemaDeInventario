@@ -13,7 +13,7 @@ const Login = () => {
     // Aqui você pode adicionar lógica de autenticação, se necessário
     
     // Redireciona para a página Home após o login
-    navigate('/Home');
+    navigate('/portal/Home');
   };
 
   return (

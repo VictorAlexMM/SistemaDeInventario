@@ -1,4 +1,3 @@
-// src/App.js
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes, useLocation } from 'react-router-dom';
 import NavBar from './components/NavBar';
@@ -14,7 +13,7 @@ import './styles/App.css';
 const Layout = ({ children }) => {
   const location = useLocation();
   const isLoginPage = location.pathname === '/';
-  const isComodatoPage = location.pathname === '/comodato';
+  const isComodatoPage = location.pathname === '/portal/comodato'; // Ajuste aqui
 
   return (
     <div className="app-container">
@@ -34,10 +33,10 @@ function App() {
     <Router>
       <Routes>
         <Route path="/" element={<Layout><Login /></Layout>} />
-        <Route path="/Home" element={<Layout><Home /></Layout>} />
-        <Route path="/licencas" element={<Layout><Licencas /></Layout>} />
-        <Route path="/inventario" element={<Layout><Estoque /></Layout>} />
-        <Route path="/comodato" element={<Layout><Comodato /></Layout>} />
+        <Route path="/portal/Home" element={<Layout><Home /></Layout>} />
+        <Route path="/portal/licencas" element={<Layout><Licencas /></Layout>} />
+        <Route path="/portal/inventario" element={<Layout><Estoque /></Layout>} />
+        <Route path="/portal/comodato" element={<Layout><Comodato /></Layout>} />
       </Routes>
     </Router>
   );
