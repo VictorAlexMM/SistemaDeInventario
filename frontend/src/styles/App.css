@@ -4,7 +4,7 @@ body, html {
   padding: 0;
   height: 100%;
   width: 100%;
-  background: #f4f4f4; /* Cor de fundo leve */
+  background: #333; /* Cor de fundo leve */
 }
 
 * {
@@ -22,7 +22,7 @@ body, html {
   padding: 20px; /* Ajuste conforme necessário */
   padding-bottom: 60px; /* Espaço para o footer */
   background: #333; /* Cor de fundo do content-container */
-  color: #fff; /* Cor do texto para contraste */
+  color: #000000; /* Cor do texto para contraste */
 }
 
 /* Estilos responsivos */
