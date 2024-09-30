@@ -3,9 +3,10 @@
   margin: 20px;
 }
 
-h1 {
-  color: #ffffff;
-  margin-bottom: 10px;
+
+.estoque-container h1 {
+  color: #fff; /* Cor do texto do h1 */
+  margin-bottom: 10px; /* Espaçamento no final do h1 */
 }
 
 .form-buttons {
@@ -262,20 +263,20 @@ input[type="checkbox"] {
   left: 50%;
   transform: translate(-50%, -50%);
   background-color: #333; /* Cor de fundo escura */
-  padding: 20px; /* Espaçamento interno */
+  padding: 20px;
+  border: 1px solid #444; /* Borda de leve preta */
   border-radius: 10px;
- /* Borda arredondada */
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Sombra suave */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   z-index: 1000;
-  width: 70%; /* Largura ajustada */
-  max-width: 350px; /* Largura máxima ajustada */
+  width: 300px;
+  max-width: 300px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  font-family: Arial; /* Fonte Arial */
-  font-size: 18px; /* Tamanho da fonte */
-  color: #fff; /* Cor do texto */
-  text-align: center; /* Alinhamento do texto */
+  font-family: Arial;
+  font-size: 14px;
+  color: #fff;
+  text-align: center;
 }
 
 /* Estilo para o formulário dentro do modal */
@@ -306,6 +307,7 @@ input[type="checkbox"] {
   cursor: pointer; /* Cursor do botão */
   transition: background-color 0.3s; /* Transição do botão */
   margin: 10px; /* Espaçamento do botão */
+  display: inline-block; /* Faz com que os botões fiquem um do lado do outro */
 }
 
 .import-csv-modal button:hover {
@@ -324,6 +326,8 @@ input[type="checkbox"] {
 /* Estilo para o botão de baixar exemplo CSV */
 .import-csv-modal button.download-example {
   background-color: #28a745;
+  display: block; /* Faz com que o botão fique em uma linha separada */
+  margin-top: 20px; /* Adiciona um espaçamento entre o botão e os outros botões */
 }
 
 .import-csv-modal button.download-example:hover {
@@ -352,19 +356,20 @@ input[type="checkbox"] {
   left: 50%;
   transform: translate(-50%, -50%);
   background-color: #333; /* Cor de fundo escura */
-  padding: 20px; /* Espaçamento interno */
-  border-radius: 10px; /* Borda arredondada */
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Sombra suave */
+  padding: 20px;
+  border: 1px solid #444; /* Borda de leve preta */
+  border-radius: 10px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   z-index: 1000;
-  width: 70%; /* Largura ajustada */
-  max-width: 350px; /* Largura máxima ajustada */
+  width: 300px;
+  max-width: 300px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  font-family: Arial; /* Fonte Arial */
-  font-size: 18px; /* Tamanho da fonte */
-  color: #fff; /* Cor do texto */
-  text-align: center; /* Alinhamento do texto */
+  font-family: Arial;
+  font-size: 14px;
+  color: #fff;
+  text-align: center;
 }
 
 .export-popup button {
@@ -377,6 +382,7 @@ input[type="checkbox"] {
   cursor: pointer; /* Cursor do botão */
   transition: background-color 0.3s; /* Transição do botão */
   margin: 10px; /* Espaçamento do botão */
+  display: inline-block; /* Faz com que os botões fiquem um do lado do outro */
 }
 
 .export-popup input[type="file"] {
@@ -384,4 +390,8 @@ input[type="checkbox"] {
   font-size: 16px; /* Tamanho da fonte do input */
   border: 1px solid #ccc; /* Borda do input */
   border-radius: 6px; /* Borda arredondada do input */
+}
+
+.export-popup h2 {
+  color: #fff; /* Cor do texto do h2 */
 }

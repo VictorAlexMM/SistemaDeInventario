@@ -1,7 +1,8 @@
 {
   "name": "portalti.v2",
   "version": "0.1.0",
-  "proxy": "http://localhost:3000",
+  "proxy": "http://10.0.88.38",
+  "homepage": "http://mao-s038:85/",
   "private": true,
   "dependencies": {
     "@fortawesome/free-solid-svg-icons": "^6.6.0",

@@ -2,7 +2,6 @@
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import Login from './components/Login';
-import Home from './components/Home';
 import Licencas from './components/Licencas';
 import Estoque from './components/Estoque';
 import './styles/App.css';
@@ -13,7 +12,6 @@ function App() {
     <Router>
       <Routes>
         <Route path="/" element={<Login />} />
-        <Route path="/portal/Home" element={<Home />} />
         <Route path="/portal/licencas" element={<Licencas />} />
         <Route path="/portal/inventario" element={<Estoque />} />
         <Route path="/portal/comodato" element={<Comodato/>}/>

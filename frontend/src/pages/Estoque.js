@@ -56,7 +56,7 @@ function Estoque() {
   const handleExport = async () => {
     setIsExporting(true);
     try {
-      const response = await axios.get('http://localhost:5000/inventario');
+      const response = await axios.get('http://10.0.88.38:5000/inventario');
       const data = response.data;
       const filteredData = data.filter(item => {
         const createdAt = moment(item.dataCriacao);
@@ -142,7 +142,7 @@ function Estoque() {
   
   const downloadByPeriod = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/inventario');
+      const response = await axios.get('http://10.0.88.38:5000/inventario');
       const data = response.data;
       const filteredData = data.filter(item => {
         const createdAt = moment(item.dataCriacao);
@@ -222,7 +222,7 @@ function Estoque() {
 
  const getEstoque = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/inventario');
+      const response = await axios.get('http://10.0.88.38:5000/inventario');
       setEstoque(response.data);
     } catch (error) {
       console.error('Erro ao obter os dados:', error);
@@ -247,7 +247,7 @@ function Estoque() {
       const compartilhada = newEstoque.compartilhada === 'Sim' ? 'Sim' : 'Não';
       const comodato = newEstoque.comodato === 'Sim' ? 'Sim' : 'Não';
       const method = editingIndex !== null ? 'put' : 'post';
-      const url = editingIndex !== null ? `http://localhost:5000/inventario/${newEstoque.patrimonio}` : 'http://localhost:5000/inventario';
+      const url = editingIndex !== null ? `http://10.0.88.38:5000/inventario/${newEstoque.patrimonio}` : 'http://10.0.88.38:5000/inventario';
       const dataNf = moment(newEstoque.dataNf).format('YYYY-MM-DD');
       const dataRecebimento = moment(newEstoque.dataRecebimento).format('YYYY-MM-DD');
       const dataEntradaFiscal = moment(newEstoque.dataEntradaFiscal).format('YYYY-MM-DD');
@@ -361,7 +361,7 @@ function Estoque() {
         }
   
         try {
-          const response = await axios.post('http://localhost:5000/inventario/importar', formattedData);
+          const response = await axios.post('http://10.0.88.38:5000/inventario/importar', formattedData);
           console.log('Dados importados com sucesso:', response.data);
           alert('Dados importados com sucesso!');
           getEstoque();
@@ -474,8 +474,8 @@ function Estoque() {
   };
 
   return (
-    <div>
-      <h1>Inventário</h1>
+      <div className="estoque-container">
+        <h1>Inventário</h1>
       <div className="form-buttons">
         <input
           className='search-container'
