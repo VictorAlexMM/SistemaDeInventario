@@ -1,7 +1,6 @@
 {
   "name": "portalti.v2",
   "version": "0.1.0",
-  "proxy": "http://10.0.88.38",
   "homepage": "http://mao-s038:85/",
   "private": true,
   "dependencies": {

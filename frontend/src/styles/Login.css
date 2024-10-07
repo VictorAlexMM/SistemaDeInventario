@@ -1,74 +1,171 @@
-/* src/styles/Login.css */
+@import url('https://fonts.googleapis.com/css?family=Montserrat:400,800');
+
+* {
+    box-sizing: border-box;
+}
 
 body {
-  margin: 0;
-  padding: 0;
-  font-family: Arial, sans-serif;
+    background: #f6f5f7; /* Cor de fundo clara */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    font-family: 'Montserrat', sans-serif;
+    height: 100vh;
+    margin: -20px 0 50px;
 }
 
-.login-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-  background-color: #333; /* Fundo cinza escuro */
-  color: #fff; /* Texto branco */
-  flex-direction: column;
+h1 {
+    font-weight: bold;
+    margin: 0;
 }
 
-.login-form {
-  background: #444; /* Fundo do formulário em um tom mais claro de cinza */
-  padding: 20px;
-  border-radius: 8px;
-  width: 100%;
-  max-width: 400px; /* Limita a largura do formulário */
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5); /* Sombra para dar profundidade */
-  text-align: center; /* Centraliza o texto do título e o conteúdo do formulário */
-  display: flex;
-  flex-direction: column;
-  align-items: center; /* Alinha itens no centro horizontalmente */
+h2 {
+    text-align: center;
 }
 
-.login-title {
-  margin-bottom: 20px; /* Espaçamento abaixo do título */
-  font-size: 2em;
-  padding: 10px;
+p {
+    font-size: 14px;
+    font-weight: 100;
+    line-height: 20px;
+    letter-spacing: 0.5px;
+    margin: 20px 0 30px;
 }
 
-.login-label {
-  display: block;
-  margin-bottom: 8px;
-  font-weight: bold;
-  text-align: left; /* Alinha os rótulos à esquerda dentro do formulário */
-  width: 100%; /* Faz com que os rótulos ocupem toda a largura do formulário */
+span {
+    font-size: 12px;
 }
 
-.login-input {
-  width: 100%;
-  padding: 10px;
-  margin-bottom: 15px;
-  border: 1px solid #555; /* Borda sutil para os campos de entrada */
-  border-radius: 5px;
-  background-color: #555; /* Fundo dos campos de entrada em um tom mais escuro de cinza */
-  color: #fff; /* Texto branco nos campos de entrada */
+a {
+    color: #333;
+    font-size: 14px;
+    text-decoration: none;
+    margin: 15px 0;
 }
 
-.login-input::placeholder {
-  color: #aaa; /* Cor do texto do placeholder */
+button {
+    border-radius: 20px;
+    border: 1px solid #FF4B2B;
+    background-color: #FF4B2B;
+    color: #FFFFFF;
+    font-size: 12px;
+    font-weight: bold;
+    padding: 12px 45px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    transition: transform 80ms ease-in;
 }
 
-.login-button {
-  width: 100%;
-  padding: 10px;
-  border: none;
-  border-radius: 5px;
-  background-color: #007bff; /* Cor azul para o botão */
-  color: #fff; /* Texto branco no botão */
-  font-size: 1em;
-  cursor: pointer;
-  transition: background-color 0.3s; /* Transição suave para a cor de fundo */
+button:active {
+    transform: scale(0.95);
 }
 
-.login-button:hover {
-  background-color: #0056b3; /* Azul mais escuro ao passar o mouse sobre o botão */
+button:focus {
+    outline: none;
+}
+
+button.ghost {
+    background-color: transparent;
+    border-color: #FFFFFF;
+}
+
+.main {
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 14px 28px rgba(0, 0, 0, 0.25), 
+                0 10px 10px rgba(0, 0, 0, 0.22);
+    position: relative;
+    overflow: hidden;
+    width: 400px; /* Ajuste o tamanho conforme necessário */
+    max-width: 100%;
+    min-height: 480px;
+    padding: 20px;
+}
+
+.form-container {
+    position: relative; /* Mantém a posição relativa para o overlay */
+    height: 100%;
+    display: flex; /* Usado para colocar os formulários lado a lado */
+    flex-direction: column; /* Mudança para coluna */
+}
+
+.input-container {
+    margin-bottom: 20px;
+    width: 100%; /* Garante que os inputs ocupem toda a largura do form */
+}
+
+input {
+    background-color: #eee;
+    border: none;
+    padding: 12px 15px;
+    margin: 8px 0;
+    width: 100%;
+}
+
+.social-container {
+    margin: 20px 0;
+}
+
+.social-container a {
+    border: 1px solid #DDDDDD;
+    border-radius: 50%;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0 5px;
+    height: 40px;
+    width: 40px;
+}
+
+.error-message {
+    color: red;
+    text-align: center;
+}
+
+/* Estilização do checkbox personalizado */
+.login-checkbox {
+    display: flex;
+    align-items: center;
+    margin: 20px 0;
+}
+
+.login-checkbox input[type="checkbox"] {
+    display: none; /* Esconde o checkbox padrão */
+}
+
+.login-checkbox label {
+    position: relative;
+    cursor: pointer;
+    padding-left: 30px; /* Espaço para o checkbox estilizado */
+    font-size: 14px;
+    color: #333;
+}
+
+.login-checkbox label:before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 20px; /* Largura do checkbox estilizado */
+    height: 20px; /* Altura do checkbox estilizado */
+    border: 2px solid #FF4B2B; /* Cor da borda */
+    border-radius: 5px; /* Bordas arredondadas */
+    background: white; /* Cor de fundo */
+    transition: background 0.3s, border-color 0.3s;
+}
+
+.login-checkbox input[type="checkbox"]:checked + label:before {
+    background: #FF4B2B; /* Cor de fundo quando selecionado */
+    border-color: #FF4B2B; /* Cor da borda quando selecionado */
+}
+
+.login-checkbox input[type="checkbox"]:checked + label:after {
+    content: '✔'; /* Adiciona um símbolo de verificação */
+    position: absolute;
+    left: 5px; /* Ajuste a posição do símbolo */
+    top: 50%;
+    transform: translateY(-50%);
+    color: white; /* Cor do símbolo */
+    font-size: 16px; /* Tamanho do símbolo */
 }
