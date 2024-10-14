@@ -78,13 +78,14 @@ const comparePassword = async (password, hashedPassword) => {
 };
 
 // Função para gerar token JWT
-const generateToken = (username, perfil) => {
-  return jwt.sign({ username, perfil }, process.env.SECRET_KEY, { expiresIn: '1h' });
+const generateToken = (username) => {
+  return jwt.sign({ username }, process.env.SECRET_KEY, { expiresIn: '1h' });
 };
+
 
 // Função para obter detalhes do usuário do banco de dados
 const getUserDetailsFromDB = async (username) => {
-  const query = 'SELECT password, perfil FROM dbo.usuarios WHERE username = @username';
+  const query = 'SELECT username, nome_completo, password FROM dbo.usuarios WHERE username = @username';
   const request = new mssql.Request(pool);
   request.input('username', mssql.VarChar, username);
   const results = await request.query(query);
@@ -117,19 +118,34 @@ const verifyProfile = (requiredProfile) => {
   };
 };
 
+// Middleware para verificar o token JWT
+const verifyToken = async (req, res, next) => {
+  const token = req.headers['authorization']?.split(' ')[1];
+
+  if (!token) {
+    return res.status(401).json({ error: 'Token não fornecido' });
+  }
+
+  try {
+    const decoded = jwt.verify(token, process.env.SECRET_KEY);
+    req.user = decoded;
+    req.criadoPor = decoded.username; // Recuperar o username da carga do token
+    next();
+  } catch (error) {
+    return res.status(401).json({ error: 'Token inválido' });
+  }
+};
 
 // Endpoint de login
 app.post('/login', loginLimiter, validateInput, async (req, res) => {
   try {
     const { username, password } = req.body;
     const user = await getUserDetailsFromDB(username);
-    const isValid = await comparePassword(password, user.password);
+    const isValid = await comparePassword(password, user.password); // Verifique se os argumentos estão corretos
 
     if (isValid) {
-      const token = generateToken(user.username, user.perfil);
-      res.cookie('username', user.username, { httpOnly: true });
-      res.cookie('userDetails', JSON.stringify(user), { httpOnly: true }); // Armazene os detalhes do usuário em um cookie
-      console.log(`Usuário logado: ${user.username}`); 
+      const token = generateToken(user.username);
+      user.criadoPor = username;
       res.json({ token });
     } else {
       res.status(401).json({ error: 'Usuário ou senha incorretos' });
@@ -161,10 +177,15 @@ app.post('/logout', (req, res) => {
 });
 
 // Endpoint para obter informações do usuário conectado
-app.get('/usuario-logado', verifyProfile('user'), (req, res) => {
-  const token = req.headers['authorization']?.split(' ')[1];
-  const decoded = jwt.verify(token, process.env.SECRET_KEY);
-  res.json({ username: decoded.username });
+app.get('/usuario-logado', verifyToken, async (req, res) => {
+  try {
+    const user = await getUserDetailsFromDB(req.user.username);
+    console.log('Usuário logado:', user.username); 
+    res.json({ username: user.username, nomeCompleto: user.nome_completo });
+  } catch (error) {
+    console.error('Erro ao obter informações do usuário:', error.message);
+    res.status(500).json({ error: 'Erro ao obter informações do usuário' });
+  }
 });
 
 // Endpoint para criar usuário
@@ -203,15 +224,15 @@ app.post('/criar-usuario', validateInput, async (req, res) => {
 });
 
 // Rotas protegidas
-app.get('/admin-endpoint', verifyProfile('admin'), (req, res) => {
+app.get('/admin-endpoint', verifyToken, verifyProfile('admin'), (req, res) => {
   res.send('Conteúdo da página admin');
 });
 
-app.get('/inventario', verifyProfile('user'), (req, res) => {
+app.get('/inventario', verifyToken, verifyProfile('user'), (req, res) => {
   res.send('Conteúdo do inventário');
 });
 
-app.get('/comodato', verifyProfile('user'), (req, res) => {
+app.get('/comodato', verifyToken, verifyProfile('user'), (req, res) => {
   res.send('Conteúdo do comodato');
 });
 

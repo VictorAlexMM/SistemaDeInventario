@@ -8,8 +8,23 @@ const Login = () => {
   const [password, setPassword] = useState('');
   const [nomeCompleto, setNomeCompleto] = useState('');
   const [error, setError] = useState(null);
-  const [isCreatingUser , setIsCreatingUser ] = useState(false);
-  const [loggedUser , setLoggedUser ] = useState({});
+  const [isCreatingUser   , setIsCreatingUser   ] = useState(false);
+  const [loggedUser   , setLoggedUser   ] = useState({});
+  const [token, setToken] = useState('');
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      setToken(token);
+    }
+  }, []);
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      navigate('/portal/inventario', { state: { token } });
+    }
+  }, []);
 
   const handleLogin = async () => {
     setError(null);
@@ -29,14 +44,32 @@ const Login = () => {
       }
 
       const data = await response.json();
-      setLoggedUser ({ username, nomeCompleto });
-      navigate('/portal/inventario'); // Redireciona para a nova rota
+      localStorage.setItem('token', data.token); // Armazene o token no localStorage
+      setToken(data.token);
+
+      // Obter o nome completo do usuário logado
+      const responseUser  = await fetch('http://localhost:5000/usuario-logado', {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${data.token}`,
+        },
+      });
+
+      if (!responseUser .ok) {
+        const errorData = await responseUser .json();
+        throw new Error(errorData.error || 'Erro ao obter informações do usuário');
+      }
+
+      const userData = await responseUser .json();
+      setLoggedUser   ({ username: userData.username, nomeCompleto: userData.nomeCompleto });
+
+      navigate('/portal/inventario', { state: { token: data.token } }); // Redireciona para a nova rota
     } catch (error) {
       setError(error.message);
     }
   };
 
-  const handleCreateUser  = async () => {
+  const handleCreateUser    = async () => {
     setError(null);
     try {
       const response = await fetch('http://localhost:5000/criar-usuario', {
@@ -53,26 +86,33 @@ const Login = () => {
       }
 
       alert('Usuário criado com sucesso! Você pode fazer login agora.');
-      setIsCreatingUser (false);
+      setIsCreatingUser   (false);
     } catch (error) {
       setError(error.message);
     }
   };
 
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    setLoggedUser   ({});
+    setNomeCompleto('');
+    // Redirecione ou faça outras ações de logout
+  };
+
   const handleToggle = () => {
-    setIsCreatingUser (!isCreatingUser );
+    setIsCreatingUser   (!isCreatingUser   );
   };
 
   return (
     <div className="main">
-      <h2>{isCreatingUser  ? 'Criar Conta' : 'Login'}</h2>
+      <h2>{isCreatingUser    ? 'Criar Conta' : 'Login'}</h2>
       <div className="login-checkbox">
-        <input type="checkbox" id="chk" checked={isCreatingUser } onChange={handleToggle} aria-hidden="true" />
+        <input type="checkbox" id="chk" checked={isCreatingUser   } onChange={handleToggle} aria-hidden="true" />
         <label htmlFor="chk">Criar Usuário</label>
       </div>
 
       <div className="form-container">
-        {isCreatingUser   ? (
+        {isCreatingUser    ? (
           <div className="signup">
             <form onSubmit={(e) => e.preventDefault()}>
               <div className="input-container">
@@ -90,7 +130,7 @@ const Login = () => {
                   type="text"
                   placeholder="Nome Completo"
                   value={nomeCompleto}
-                  onChange={(e) => setNomeCompleto(e.target.value)}
+                  onChange={( e) => setNomeCompleto(e.target.value)}
                   required
                   className="input-field"
                 />
@@ -105,7 +145,7 @@ const Login = () => {
                   className="input-field"
                 />
               </div>
-              <button type="button" className="create-user-button" onClick={handleCreateUser  }>Criar Usuário</button>
+              <button type="button" className="create-user-button" onClick={handleCreateUser   }>Criar Usuário</button>
             </form>
           </div>
         ) : (
