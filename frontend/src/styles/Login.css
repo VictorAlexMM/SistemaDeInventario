@@ -42,11 +42,8 @@ a {
     text-decoration: none;
     margin: 15px 0;
 }
-
-button {
-    border-radius: 20px;
-    border: 1px solid #FF4B2B;
-    background-color: #FF4B2B;
+button.login-button {
+    background-color: #FF4B2B; /* Cor do botão de login */
     color: #FFFFFF;
     font-size: 12px;
     font-weight: bold;
@@ -54,7 +51,24 @@ button {
     letter-spacing: 1px;
     text-transform: uppercase;
     transition: transform 80ms ease-in;
-}
+    position: relative; /* Adicione essa linha */
+    left: 110px; /* Ajuste o valor para a posição desejada */
+    border-radius: 9px;
+  }
+  
+  button.create-user-button {
+    background-color: #FF4B2B; /* Cor do botão de login */
+    color: #FFFFFF;
+    font-size: 12px;
+    font-weight: bold;
+    padding: 12px 45px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    transition: transform 80ms ease-in;
+    position: relative; /* Adicione essa linha */
+    left: 70px; /* Ajuste o valor para a posição desejada */
+    border-radius: 9px;
+  }
 
 button:active {
     transform: scale(0.95);
@@ -91,17 +105,27 @@ button.ghost {
 
 .input-container {
     margin-bottom: 20px;
-    width: 100%; /* Garante que os inputs ocupem toda a largura do form */
-}
+  }
 
-input {
+  input {
     background-color: #eee;
     border: none;
     padding: 12px 15px;
     margin: 8px 0;
     width: 100%;
-}
+    border-radius: 9px;
+    height: 40px; /* Defina a altura para 40px */
+  }
 
+  .input-field {
+    height: 40px;
+    width: 100%;
+    padding: 12px 15px;
+    margin: 8px 0;
+    border: none;
+    border-radius: 9px;
+    background-color: #eee;
+  }
 .social-container {
     margin: 20px 0;
 }

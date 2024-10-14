@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../styles/Login.css';
 
@@ -8,11 +8,13 @@ const Login = () => {
   const [password, setPassword] = useState('');
   const [nomeCompleto, setNomeCompleto] = useState('');
   const [error, setError] = useState(null);
-  const [isCreatingUser, setIsCreatingUser] = useState(false);
+  const [isCreatingUser , setIsCreatingUser ] = useState(false);
+  const [loggedUser , setLoggedUser ] = useState({});
 
   const handleLogin = async () => {
     setError(null);
     try {
+      await new Promise(resolve => setTimeout(resolve, 1000)); // Adicione um tempo de espera de 1 segundo
       const response = await fetch('http://localhost:5000/login', {
         method: 'POST',
         headers: {
@@ -27,14 +29,14 @@ const Login = () => {
       }
 
       const data = await response.json();
-      localStorage.setItem('token', data.token);
+      setLoggedUser ({ username, nomeCompleto });
       navigate('/portal/inventario'); // Redireciona para a nova rota
     } catch (error) {
       setError(error.message);
     }
   };
 
-  const handleCreateUser = async () => {
+  const handleCreateUser  = async () => {
     setError(null);
     try {
       const response = await fetch('http://localhost:5000/criar-usuario', {
@@ -51,26 +53,26 @@ const Login = () => {
       }
 
       alert('Usuário criado com sucesso! Você pode fazer login agora.');
-      setIsCreatingUser(false);
+      setIsCreatingUser (false);
     } catch (error) {
       setError(error.message);
     }
   };
 
   const handleToggle = () => {
-    setIsCreatingUser(!isCreatingUser);
+    setIsCreatingUser (!isCreatingUser );
   };
 
   return (
     <div className="main">
-      <h2>{isCreatingUser ? 'Criar Conta' : 'Login'}</h2>
+      <h2>{isCreatingUser  ? 'Criar Conta' : 'Login'}</h2>
       <div className="login-checkbox">
-        <input type="checkbox" id="chk" checked={isCreatingUser} onChange={handleToggle} aria-hidden="true" />
+        <input type="checkbox" id="chk" checked={isCreatingUser } onChange={handleToggle} aria-hidden="true" />
         <label htmlFor="chk">Criar Usuário</label>
       </div>
-  
+
       <div className="form-container">
-        {isCreatingUser ? (
+        {isCreatingUser   ? (
           <div className="signup">
             <form onSubmit={(e) => e.preventDefault()}>
               <div className="input-container">
@@ -103,7 +105,7 @@ const Login = () => {
                   className="input-field"
                 />
               </div>
-              <button type="button" onClick={handleCreateUser}>Criar Usuário</button>
+              <button type="button" className="create-user-button" onClick={handleCreateUser  }>Criar Usuário</button>
             </form>
           </div>
         ) : (
@@ -129,13 +131,14 @@ const Login = () => {
                   className="input-field"
                 />
               </div>
-              <button type="button" onClick={handleLogin}>Login</button>
+              <button type="button" className="login-button" onClick={handleLogin}>Login</button>
             </form>
           </div>
         )}
       </div>
-      {error && <p className="error-message">{error}</p>}
-    </div>
+
+      {error && <div className="error">{error}</div>}
+ </div>
   );
 };
 

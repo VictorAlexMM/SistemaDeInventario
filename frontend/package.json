@@ -1,7 +1,7 @@
 {
   "name": "portalti.v2",
   "version": "0.1.0",
-  "homepage": "http://mao-s038:85/",
+  "homepage": "http://localhost/",
   "private": true,
   "dependencies": {
     "@fortawesome/free-solid-svg-icons": "^6.6.0",
@@ -27,12 +27,11 @@
     "react-scripts": "5.0.1",
     "web-vitals": "^2.1.4"
   },
-  "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject"
-  },
+"scripts": {
+  "start": "react-scripts start --host 0.0.0.0 --port 85",
+  "build": "react-scripts build",
+  "test": "react-scripts test"
+},
   "eslintConfig": {
     "extends": [
       "react-app",

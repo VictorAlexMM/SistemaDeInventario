@@ -117,6 +117,7 @@ const verifyProfile = (requiredProfile) => {
   };
 };
 
+
 // Endpoint de login
 app.post('/login', loginLimiter, validateInput, async (req, res) => {
   try {
@@ -126,6 +127,9 @@ app.post('/login', loginLimiter, validateInput, async (req, res) => {
 
     if (isValid) {
       const token = generateToken(user.username, user.perfil);
+      res.cookie('username', user.username, { httpOnly: true });
+      res.cookie('userDetails', JSON.stringify(user), { httpOnly: true }); // Armazene os detalhes do usuário em um cookie
+      console.log(`Usuário logado: ${user.username}`); 
       res.json({ token });
     } else {
       res.status(401).json({ error: 'Usuário ou senha incorretos' });
@@ -134,6 +138,33 @@ app.post('/login', loginLimiter, validateInput, async (req, res) => {
     console.error('Erro ao fazer login:', error.message);
     res.status(401).json({ error: 'Erro ao fazer login' });
   }
+});
+
+app.post('/logout', (req, res) => {
+  // Clear the cookies
+  res.clearCookie('username');
+  res.clearCookie('userDetails');
+
+  // Destroy the session (if it exists)
+  if (req.session) {
+    req.session.destroy((err) => {
+      if (err) {
+        console.error('Error destroying session:', err);
+        res.status(500).json({ error: 'Error destroying session' });
+      } else {
+        res.json({ message: 'Logged out successfully' });
+      }
+    });
+  } else {
+    res.json({ message: 'Logged out successfully' });
+  }
+});
+
+// Endpoint para obter informações do usuário conectado
+app.get('/usuario-logado', verifyProfile('user'), (req, res) => {
+  const token = req.headers['authorization']?.split(' ')[1];
+  const decoded = jwt.verify(token, process.env.SECRET_KEY);
+  res.json({ username: decoded.username });
 });
 
 // Endpoint para criar usuário

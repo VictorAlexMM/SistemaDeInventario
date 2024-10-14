@@ -27,5 +27,5 @@ app.get('/api/system-info', (req, res) => {
 });
 
 app.listen(port, () => {
-  console.log(`API Server running at http://mao-s038:${port}`);
+  console.log(`API Server running at http://localhost:${port}`);
 });

@@ -1,4 +1,3 @@
-/* Estilos gerais */
 body {
   font-family: Arial, sans-serif;
   background-color: #f4f4f4;
@@ -7,77 +6,37 @@ body {
 }
 
 .comodato-container {
-  max-width: 800px; /* Ajustado para um tamanho menor, mantendo o design */
+  width: 650px;
   margin: 20px auto;
-  padding: 20px;
+  padding: 10px; /* Adjusted padding for better layout */
   background-color: #fff;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
-h1 {
-  color: #333;
-  text-align: center; /* Centraliza o título */
+h1, h2 {
+  font-size: 1.4em; /* Consolidate font sizes for headings */
+  margin-bottom: 5px; /* Reduce margin to create more space for the content */
 }
 
-h2 {
-  color: #555;
+.form-group, label, input[type="text"], .agreement, .submit-button {
+  margin-bottom: 5px; /* Consolidate margin styles */
+  padding: 5px; /* Consolidate padding styles */
 }
 
-.form-group {
-  margin-bottom: 15px;
-}
-
-label {
-  display: block;
-  margin-bottom: 5px;
-}
-
-input[type="text"] {
-  width: 100%;
-  padding: 8px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-}
-
-.agreement {
-  display: flex; /* Usar flexbox para alinhar o checkbox e o texto */
-  align-items: center; /* Alinha verticalmente ao centro */
-  margin-top: 10px;
-}
-
-.agreement input[type="checkbox"] {
-  margin-right: 10px; /* Espaço entre o checkbox e o label */
-}
-
-.submit-button {
-  background-color: #007bff;
-  color: white;
-  border: none;
-  padding: 10px 20px;
-  cursor: pointer;
-  border-radius: 5px;
-  width: 100%; /* Botão ocupa toda a largura */
-}
-
-.submit-button:hover {
-  background-color: #0056b3;
+.comodato-content {
+  font-size: 0.9em; /* Reduce font size to make the content more compact */
+  line-height: 1.2; /* Reduce line height to make the content more dense */
 }
 
 /* Estilos para telas com largura mínima de 1200px */
-@media only screen and (min-width: 1200px) {
+@media only screen and (max-width: 800px) {
   .comodato-container {
-    padding: 40px; /* Aumenta o padding do container */
+    padding: 10px; /* Adjust padding for smaller screens */
   }
-
-  h1 {
-    font-size: 2.5em; /* Aumenta o tamanho do título */
+  h1, h2 {
+    font-size: 1.2em; /* Adjust font size for smaller screens */
   }
-
-  h2 {
-    font-size: 1.8em; /* Aumenta o tamanho dos subtítulos */
-  }
-
   .submit-button {
-    padding: 15px 30px; /* Aumenta o padding do botão */
+    padding: 10px 15px; /* Adjust padding for smaller screens */
   }
 }

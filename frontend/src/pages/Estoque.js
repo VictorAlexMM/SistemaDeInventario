@@ -132,6 +132,7 @@ function Estoque() {
     });
   };
 
+
   const handleDownload = async () => {
     if (downloadOption === 'completo') {
       downloadFilledCSV();
@@ -209,16 +210,13 @@ function Estoque() {
   }, [filteredEstoque, sortConfig]);
 
   useEffect(() => {
+    setNewEstoque(prevState => ({ ...prevState, criadoPor: getCookie('username') }));
+  }, [getCookie('username')]);
+
+  useEffect(() => {
     const setor = centroDeCusto[newEstoque.centroDeCusto] || '';
     setNewEstoque(prevState => ({ ...prevState, setor }));
   }, [newEstoque.centroDeCusto]);
-
-  useEffect(() => {
-    const usuarioLogado = getCookie('username');
-    setNewEstoque (prevState => ({
-      ...prevState,
-      criadoPor: usuarioLogado }));
-  }, []);
 
  const getEstoque = async () => {
     try {
@@ -247,7 +245,7 @@ function Estoque() {
       const compartilhada = newEstoque.compartilhada === 'Sim' ? 'Sim' : 'Não';
       const comodato = newEstoque.comodato === 'Sim' ? 'Sim' : 'Não';
       const method = editingIndex !== null ? 'put' : 'post';
-      const url = editingIndex !== null ? `http://10.0.88.38:5000/inventario/${newEstoque.patrimonio}` : 'http://localhost:5001/inventario';
+      const url = editingIndex !== null ? `http://localhost:5001/inventario/${newEstoque.patrimonio}` : 'http://localhost:5001/inventario';
       const dataNf = moment(newEstoque.dataNf).format('YYYY-MM-DD');
       const dataRecebimento = moment(newEstoque.dataRecebimento).format('YYYY-MM-DD');
       const dataEntradaFiscal = moment(newEstoque.dataEntradaFiscal).format('YYYY-MM-DD');
@@ -274,6 +272,7 @@ function Estoque() {
       alert(errorMessage);
     }
   };
+
   const requestSort = (key) => {
     let direction = 'asc';
     if (sortConfig.key === key && sortConfig.direction === 'asc') {
@@ -361,7 +360,7 @@ function Estoque() {
         }
   
         try {
-          const response = await axios.post('http://10.0.88.38:5000/inventario/importar', formattedData);
+          const response = await axios.post('http://localhost:50010/inventario/importar', formattedData);
           console.log('Dados importados com sucesso:', response.data);
           alert('Dados importados com sucesso!');
           getEstoque();
@@ -608,8 +607,8 @@ function Estoque() {
                               <td>{item.comodato === 'Sim' ? 'Sim' : 'Não'}</td>
                             </tr>
                             <tr>
-                              <td><strong>Criado Por:</strong></td>
-                              <td>{item.criadoPor}</td>
+                            <td><strong>Criado Por:</strong> {item.criadoPor}</td>
+                            <td>{item.criadoPor}</td>
                             </tr>
                           </tbody>
                         </table>
@@ -854,8 +853,7 @@ function Estoque() {
               <input
                 type="text"
                 name="criadoPor"
-                value={newEstoque.criadoPor}
-                readOnly
+                onChange={handleChange}
               />
             </label>
             <div className="button-container">

@@ -6,6 +6,7 @@ import Login from './pages/Login';
 import Licencas from './pages/Licencas';
 import Estoque from './pages/Estoque';
 import Comodato from './pages/Comodato';
+
 import './styles/App.css';
 
 // Componente Layout para adicionar NavBar e Footer
