@@ -3,28 +3,31 @@
   margin: 20px;
 }
 
-
 .estoque-container h1 {
-  color: #fff; /* Cor do texto do h1 */
+  color: #333; /* Cor do texto do h1 */
   margin-bottom: 10px; /* Espaçamento no final do h1 */
 }
 
 .form-buttons {
   display: flex; /* Usar flexbox para alinhar os botões */
-  gap: 10px; /* Espaçamento entre os botões */
-  margin-bottom: 20px; /* Espaçamento abaixo dos botões */
+  gap: 8px; /* Espaçamento entre os botões */
+  margin-bottom: 15px; /* Espaçamento abaixo dos botões */
 }
 
 .button-import,
 .button-export,
-.button-add {
-  background-color: #007bff;
-  color: rgb(255, 0, 0);
+.button-add,
+.button-edit,
+.button-collapsible,
+.button-submit,
+.button-cancel {
+  background-color: #007bff; /* Cor padrão */
+  color: #fff;
   border: none;
-  padding: 10px 15px;
-  margin-right: 10px;
+  padding: 8px 12px;
   cursor: pointer;
-  border-radius: 5px;
+  border-radius: 4px;
+  transition: background-color 0.3s;
 }
 
 .button-import {
@@ -35,50 +38,27 @@
   background-color: #ffc107;
 }
 
-.button-add {
-  background-color: #007bff;
-}
-
-.button-add {
-  background-color: #007bff;
-}
-
 .button-edit {
   background-color: #17a2b8;
-  color: white;
-  border: none;
-  padding: 5px;
-  cursor: pointer;
-  border-radius: 5px;
-}
-
-.button-collapsible {
-  background-color: #6c757d;
-  color: rgb(255, 255, 255);
-  border: none;
-  padding: 5px;
-  cursor: pointer;
-  border-radius: 5px;
-}
-
-.button-submit,
-.button-cancel {
-  background-color: #007bff;
-  color: white;
-  border: none;
-  padding: 8px 12px;
-  margin-right: 10px;
-  cursor: pointer;
-  border-radius: 5px;
 }
 
 .button-cancel {
   background-color: #dc3545;
 }
 
+.button-collapsible:hover,
+.button-import:hover,
+.button-export:hover,
+.button-edit:hover,
+.button-cancel:hover {
+  opacity: 0.9; /* Efeito de hover mais sutil */
+}
+
 .table-container {
-  margin-top: 20px;
-  background-color: #ffffff;
+  margin-top: 15px;
+  background-color: #f9f9f9; /* Fundo mais claro */
+  border-radius: 4px; /* Bordas arredondadas */
+  overflow: hidden; /* Para evitar bordas visíveis */
 }
 
 table {
@@ -87,9 +67,9 @@ table {
 }
 
 th, td {
-  border: 1px solid #000000;
-  padding: 8px;
+  padding: 10px;
   text-align: left;
+  border-bottom: 1px solid #ddd; /* Borda sutil */
 }
 
 th {
@@ -153,13 +133,11 @@ input[type="checkbox"] {
 }
 
 .collapsible-content {
-  padding: 5px;
-  background: hsl(0, 0%, 82%);
-  border-radius: 10px;
+  padding: 10px;
+  background: #e9ecef; /* Fundo mais suave */
+  border-radius: 4px;
 }
 
-/* Estilo geral do popup */
-/* Estilo para o modal de adicionar/editar */
 .add-edit-form-modal {
   position: fixed;
   top: 50%;
@@ -333,6 +311,7 @@ input[type="checkbox"] {
 .import-csv-modal button.download-example:hover {
   background-color: #218838;
 }
+
 .search-container {
   margin-bottom: 10px; /* Reduzido a margem inferior */
 }

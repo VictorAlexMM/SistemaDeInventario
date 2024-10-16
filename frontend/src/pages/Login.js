@@ -8,34 +8,38 @@ const Login = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(false); // Estado para controle de loading
 
   useEffect(() => {
-    const loggedUser = localStorage.getItem('loggedUser');
-    if (loggedUser) {
-      const parsedLoggedUser = JSON.parse(loggedUser);
-      navigate('/portal/inventario', { state: { logged: parsedLoggedUser } });
+    const loggedUser  = localStorage.getItem('loggedUser ');
+    if (loggedUser ) {
+      const parsedLoggedUser  = JSON.parse(loggedUser );
+      navigate('/portal/inventario', { state: { logged: parsedLoggedUser  } });
     }
   }, [navigate]);
 
   const handleLogin = async () => {
     setError(null);
+    setLoading(true); // Inicia o loading
     try {
-      await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate wait
+      await new Promise(resolve => setTimeout(resolve, 1000)); // Simula espera
       const response = await axios.post('http://10.0.11.55:31636/api/v1/AuthAd', {
         username,
         password,
       });
 
       const data = response.data;
-      localStorage.setItem('loggedUser', JSON.stringify({ username }));
+      localStorage.setItem('loggedUser ', JSON.stringify({ username }));
       navigate('/portal/inventario', { state: { logged: { username } } });
     } catch (error) {
       if (error.response) {
-        // If the API response indicates an error
+        // Se a resposta da API indicar um erro
         setError(error.response.data.error || 'Erro ao fazer login');
       } else {
         setError('Erro ao fazer login');
       }
+    } finally {
+      setLoading(false); // Finaliza o loading
     }
   };
 
@@ -64,8 +68,13 @@ const Login = () => {
               className="input-field"
             />
           </div>
-          <button type="button" className="login-button" onClick={handleLogin}>
-            Login
+          <button 
+            type="button" 
+            className="login-button" 
+            onClick={handleLogin} 
+            disabled={loading} // Desabilita o botão durante o loading
+          >
+            {loading ? 'Carregando...' : 'Login'} {/* Exibe mensagem de loading */}
           </button>
         </form>
       </div>

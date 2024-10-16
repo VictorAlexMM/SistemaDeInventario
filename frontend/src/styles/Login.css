@@ -5,7 +5,7 @@
 }
 
 body {
-    background: #f6f5f7; /* Cor de fundo clara */
+    background: #333; /* Light background color */
     display: flex;
     justify-content: center;
     align-items: center;
@@ -15,74 +15,6 @@ body {
     margin: -20px 0 50px;
 }
 
-h1 {
-    font-weight: bold;
-    margin: 0;
-}
-
-h2 {
-    text-align: center;
-}
-
-p {
-    font-size: 14px;
-    font-weight: 100;
-    line-height: 20px;
-    letter-spacing: 0.5px;
-    margin: 20px 0 30px;
-}
-
-span {
-    font-size: 12px;
-}
-
-a {
-    color: #333;
-    font-size: 14px;
-    text-decoration: none;
-    margin: 15px 0;
-}
-button.login-button {
-    background-color: #FF4B2B; /* Cor do botão de login */
-    color: #FFFFFF;
-    font-size: 12px;
-    font-weight: bold;
-    padding: 12px 45px;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    transition: transform 80ms ease-in;
-    position: relative; /* Adicione essa linha */
-    left: 110px; /* Ajuste o valor para a posição desejada */
-    border-radius: 9px;
-  }
-  
-  button.create-user-button {
-    background-color: #FF4B2B; /* Cor do botão de login */
-    color: #FFFFFF;
-    font-size: 12px;
-    font-weight: bold;
-    padding: 12px 45px;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    transition: transform 80ms ease-in;
-    position: relative; /* Adicione essa linha */
-    left: 70px; /* Ajuste o valor para a posição desejada */
-    border-radius: 9px;
-  }
-
-button:active {
-    transform: scale(0.95);
-}
-
-button:focus {
-    outline: none;
-}
-
-button.ghost {
-    background-color: transparent;
-    border-color: #FFFFFF;
-}
-
 .main {
     background-color: #fff;
     border-radius: 10px;
@@ -90,34 +22,29 @@ button.ghost {
                 0 10px 10px rgba(0, 0, 0, 0.22);
     position: relative;
     overflow: hidden;
-    width: 400px; /* Ajuste o tamanho conforme necessário */
+    width: 400px; /* Adjust the width as needed */
     max-width: 100%;
     min-height: 480px;
     padding: 20px;
+    display: flex; /* Use flexbox for centering */
+    flex-direction: column; /* Stack children vertically */
+    align-items: center; /* Center horizontally */
+    justify-content: center; /* Center vertically */
 }
 
 .form-container {
-    position: relative; /* Mantém a posição relativa para o overlay */
-    height: 100%;
-    display: flex; /* Usado para colocar os formulários lado a lado */
-    flex-direction: column; /* Mudança para coluna */
+    position: relative; /* Keep the relative position for the overlay */
+    height: auto; /* Allow height to adjust based on content */
+    display: flex; /* Used to place the forms side by side */
+    flex-direction: column; /* Change to column */
+    width: 100%; /* Full width of the parent */
 }
 
 .input-container {
     margin-bottom: 20px;
-  }
+}
 
-  input {
-    background-color: #eee;
-    border: none;
-    padding: 12px 15px;
-    margin: 8px 0;
-    width: 100%;
-    border-radius: 9px;
-    height: 40px; /* Defina a altura para 40px */
-  }
-
-  .input-field {
+.input-field {
     height: 40px;
     width: 100%;
     padding: 12px 15px;
@@ -125,71 +52,30 @@ button.ghost {
     border: none;
     border-radius: 9px;
     background-color: #eee;
-  }
-.social-container {
-    margin: 20px 0;
 }
 
-.social-container a {
-    border: 1px solid #DDDDDD;
-    border-radius: 50%;
-    display: inline-flex;
-    justify-content: center;
-    align-items: center;
-    margin: 0 5px;
-    height: 40px;
-    width: 40px;
+.login-button {
+    background-color: #FF4B2B; /* Button color */
+    color: #FFFFFF;
+    font-size: 12px;
+    font-weight: bold;
+    padding: 12px 45px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    transition: transform 80ms ease-in;
+    border-radius: 9px;
+    cursor: pointer; /* Change cursor to pointer */
+    margin: 0 auto; /* Add this line to center the button horizontally */
 }
 
-.error-message {
+.login-button:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+}
+
+.error {
     color: red;
-    text-align: center;
-}
-
-/* Estilização do checkbox personalizado */
-.login-checkbox {
-    display: flex;
-    align-items: center;
-    margin: 20px 0;
-}
-
-.login-checkbox input[type="checkbox"] {
-    display: none; /* Esconde o checkbox padrão */
-}
-
-.login-checkbox label {
-    position: relative;
-    cursor: pointer;
-    padding-left: 30px; /* Espaço para o checkbox estilizado */
     font-size: 14px;
-    color: #333;
-}
-
-.login-checkbox label:before {
-    content: '';
-    position: absolute;
-    left: 0;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 20px; /* Largura do checkbox estilizado */
-    height: 20px; /* Altura do checkbox estilizado */
-    border: 2px solid #FF4B2B; /* Cor da borda */
-    border-radius: 5px; /* Bordas arredondadas */
-    background: white; /* Cor de fundo */
-    transition: background 0.3s, border-color 0.3s;
-}
-
-.login-checkbox input[type="checkbox"]:checked + label:before {
-    background: #FF4B2B; /* Cor de fundo quando selecionado */
-    border-color: #FF4B2B; /* Cor da borda quando selecionado */
-}
-
-.login-checkbox input[type="checkbox"]:checked + label:after {
-    content: '✔'; /* Adiciona um símbolo de verificação */
-    position: absolute;
-    left: 5px; /* Ajuste a posição do símbolo */
-    top: 50%;
-    transform: translateY(-50%);
-    color: white; /* Cor do símbolo */
-    font-size: 16px; /* Tamanho do símbolo */
+    margin-bottom: 10px;
+    text-align: center; /* Center the error message */
 }
