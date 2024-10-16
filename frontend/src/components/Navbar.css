@@ -30,3 +30,16 @@
   background-color: #555;
   border-radius: 4px;
 }
+.logout-button {
+  background-color: #f44336; /* Cor de fundo do botão */
+  color: white; /* Cor do texto */
+  border: none; /* Remove a borda padrão */
+  padding: 10px 20px; /* Espaçamento interno do botão */
+  border-radius: 4px; /* Arredonda os cantos do botão */
+  cursor: pointer; /* Muda o cursor para indicar que é clicável */
+  margin-left: auto; /* Empurra o botão para o lado direito */
+}
+
+.logout-button:hover {
+  background-color: #d32f2f; /* Cor do botão ao passar o mouse */
+}

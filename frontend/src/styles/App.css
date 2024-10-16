@@ -5,6 +5,8 @@ body, html {
   height: 100%;
   width: 100%;
   background: #333; /* Cor de fundo leve */
+  overflow: auto; /* Permite rolagem se o conteúdo transbordar */
+  box-sizing: border-box; /* Inclui padding e border no cálculo da largura e altura */
 }
 
 * {
@@ -15,6 +17,9 @@ body, html {
   display: flex;
   flex-direction: column;
   min-height: 100vh; /* Garante que o container ocupe toda a altura da tela */
+  padding: 20px; /* Ajuste conforme necessário */
+  background: #333; /* Cor de fundo do app-container */
+  color: #000000; /* Cor do texto para contraste */
 }
 
 .content-container {

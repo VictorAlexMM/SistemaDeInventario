@@ -1,184 +1,77 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 import '../styles/Login.css';
 
 const Login = () => {
   const navigate = useNavigate();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const [nomeCompleto, setNomeCompleto] = useState('');
   const [error, setError] = useState(null);
-  const [isCreatingUser   , setIsCreatingUser   ] = useState(false);
-  const [loggedUser   , setLoggedUser   ] = useState({});
-  const [token, setToken] = useState('');
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    if (token) {
-      setToken(token);
+    const loggedUser = localStorage.getItem('loggedUser');
+    if (loggedUser) {
+      const parsedLoggedUser = JSON.parse(loggedUser);
+      navigate('/portal/inventario', { state: { logged: parsedLoggedUser } });
     }
-  }, []);
-
-  useEffect(() => {
-    const token = localStorage.getItem('token');
-    if (token) {
-      navigate('/portal/inventario', { state: { token } });
-    }
-  }, []);
+  }, [navigate]);
 
   const handleLogin = async () => {
     setError(null);
     try {
-      await new Promise(resolve => setTimeout(resolve, 1000)); // Adicione um tempo de espera de 1 segundo
-      const response = await fetch('http://localhost:5000/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ username, password }),
+      await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate wait
+      const response = await axios.post('http://10.0.11.55:31636/api/v1/AuthAd', {
+        username,
+        password,
       });
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Erro ao fazer login');
-      }
-
-      const data = await response.json();
-      localStorage.setItem('token', data.token); // Armazene o token no localStorage
-      setToken(data.token);
-
-      // Obter o nome completo do usuário logado
-      const responseUser  = await fetch('http://localhost:5000/usuario-logado', {
-        method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${data.token}`,
-        },
-      });
-
-      if (!responseUser .ok) {
-        const errorData = await responseUser .json();
-        throw new Error(errorData.error || 'Erro ao obter informações do usuário');
-      }
-
-      const userData = await responseUser .json();
-      setLoggedUser   ({ username: userData.username, nomeCompleto: userData.nomeCompleto });
-
-      navigate('/portal/inventario', { state: { token: data.token } }); // Redireciona para a nova rota
+      const data = response.data;
+      localStorage.setItem('loggedUser', JSON.stringify({ username }));
+      navigate('/portal/inventario', { state: { logged: { username } } });
     } catch (error) {
-      setError(error.message);
-    }
-  };
-
-  const handleCreateUser    = async () => {
-    setError(null);
-    try {
-      const response = await fetch('http://localhost:5000/criar-usuario', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ username, password, nomeCompleto }),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Erro ao criar usuário');
+      if (error.response) {
+        // If the API response indicates an error
+        setError(error.response.data.error || 'Erro ao fazer login');
+      } else {
+        setError('Erro ao fazer login');
       }
-
-      alert('Usuário criado com sucesso! Você pode fazer login agora.');
-      setIsCreatingUser   (false);
-    } catch (error) {
-      setError(error.message);
     }
-  };
-
-  const handleLogout = () => {
-    localStorage.removeItem('token');
-    setLoggedUser   ({});
-    setNomeCompleto('');
-    // Redirecione ou faça outras ações de logout
-  };
-
-  const handleToggle = () => {
-    setIsCreatingUser   (!isCreatingUser   );
   };
 
   return (
     <div className="main">
-      <h2>{isCreatingUser    ? 'Criar Conta' : 'Login'}</h2>
-      <div className="login-checkbox">
-        <input type="checkbox" id="chk" checked={isCreatingUser   } onChange={handleToggle} aria-hidden="true" />
-        <label htmlFor="chk">Criar Usuário</label>
-      </div>
-
+      <h2>Login</h2>
       <div className="form-container">
-        {isCreatingUser    ? (
-          <div className="signup">
-            <form onSubmit={(e) => e.preventDefault()}>
-              <div className="input-container">
-                <input
-                  type="text"
-                  placeholder="Username"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
-                  required
-                  className="input-field"
-                />
-              </div>
-              <div className="input-container">
-                <input
-                  type="text"
-                  placeholder="Nome Completo"
-                  value={nomeCompleto}
-                  onChange={( e) => setNomeCompleto(e.target.value)}
-                  required
-                  className="input-field"
-                />
-              </div>
-              <div className="input-container">
-                <input
-                  type="password"
-                  placeholder="Password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                  className="input-field"
-                />
-              </div>
-              <button type="button" className="create-user-button" onClick={handleCreateUser   }>Criar Usuário</button>
-            </form>
+        <form onSubmit={(e) => e.preventDefault()}>
+          <div className="input-container">
+            <input
+              type="text"
+              placeholder="Username"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              required
+              className="input-field"
+            />
           </div>
-        ) : (
-          <div className="login">
-            <form onSubmit={(e) => e.preventDefault()}>
-              <div className="input-container">
-                <input
-                  type="text"
-                  placeholder="Username"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
-                  required
-                  className="input-field"
-                />
-              </div>
-              <div className="input-container">
-                <input
-                  type="password"
-                  placeholder="Password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                  className="input-field"
-                />
-              </div>
-              <button type="button" className="login-button" onClick={handleLogin}>Login</button>
-            </form>
+          <div className="input-container">
+            <input
+              type="password"
+              placeholder="Password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              className="input-field"
+            />
           </div>
-        )}
+          <button type="button" className="login-button" onClick={handleLogin}>
+            Login
+          </button>
+        </form>
       </div>
 
       {error && <div className="error">{error}</div>}
- </div>
+    </div>
   );
 };
 

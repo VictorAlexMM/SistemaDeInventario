@@ -42,6 +42,7 @@
       garantia: '',
       comodato: 'Não',
       criadoPor: '',  
+      alteradoPor:'',
       dataCriacao: '',
       dataModificacao: ''
     });
@@ -56,14 +57,17 @@
     const [username, setUsername] = useState('');
     
     useEffect(() => {
-      const token = localStorage.getItem('token');
-      if (token) {
-        const decoded = jwtDecode(token);
-        setUsername(decoded.username);
-        setNewEstoque((prevState) => ({ ...prevState, criadoPor: decoded.username }));
-        console.log('Usuário logado:', decoded.username);
+      const loggedUser = localStorage.getItem('loggedUser');
+      if (loggedUser) {
+        try {
+          const user = JSON.parse(loggedUser); // Assume que loggedUser é um objeto JSON
+          setUsername(user.username); // Supondo que loggedUser tem uma propriedade 'username'
+          setNewEstoque((prevState) => ({ ...prevState, criadoPor: user.username }));
+        } catch (error) {
+          console.error('Erro ao analisar loggedUser:', error);
+        }
       }
-    }, [])
+    }, []);
     const handleExport = async () => {
       setIsExporting(true);
       try {
@@ -100,6 +104,7 @@
             Garantia: item.garantia,
             Comodato: item.comodato,
             CriadoPor: item.criadoPor,
+            AlteradoPor:item.alteradoPor,
             DataCriacao: moment(item.dataCriacao).format('DD/MM/YYYY'),
             DataModificacao: moment(item.dataModificacao).format('DD/MM/YYYY')
           };
@@ -187,6 +192,7 @@
             Garantia: item.garantia,
             Comodato: item.comodato,
             CriadoPor: item.criadoPor,
+            AlteradoPor:item.alteradoPor,
             DataCriacao: moment(item.dataCriacao).format('DD/MM/YYYY'),
             DataModificacao: moment(item.dataModificacao).format('DD/MM/YYYY')
           };
@@ -221,10 +227,6 @@
     }, [filteredEstoque, sortConfig]);
 
     useEffect(() => {
-      setNewEstoque(prevState => ({ ...prevState, criadoPor: getCookie('username') }));
-    }, [getCookie('username')]);
-
-    useEffect(() => {
       const setor = centroDeCusto[newEstoque.centroDeCusto] || '';
       setNewEstoque(prevState => ({ ...prevState, setor }));
     }, [newEstoque.centroDeCusto]);
@@ -253,13 +255,6 @@
       }
     };
 
-    const handleAddClick = () => {
-      resetNewEstoque();
-      setEditingIndex(null);
-      setIsAdding(true);
-      setNewEstoque(prevState => ({ ...prevState, criadoPor: username })); // Atualiza o criadoPor
-    };
-
     const handleSubmit = async (e) => {
       e.preventDefault();
       try {
@@ -271,15 +266,23 @@
         const data = {
           ...newEstoque,
           compartilhada: compartilhada,
+          criadoPor: username, 
           comodato: comodato,
-          criadoPor: username, // Envie o username aqui
-        };
-        if (editingIndex === null) {
-          console.log('Adding new item:', data);
-        } else {
-          console.log('Editing item:', data);
-        }
 
+          alteradoPor: username,
+        };
+        
+        // Deixe a data como opcional
+        if (data.dataNf) data.dataNf = moment(data.dataNf).format('YYYY-MM-DD');
+        if (data.dataRecebimento) data.dataRecebimento = moment(data.dataRecebimento).format('YYYY-MM-DD');
+        if (data.dataEntradaFiscal) data.dataEntradaFiscal = moment(data.dataEntradaFiscal).format('YYYY-MM-DD');
+        if (data.dataNext) data.dataNext = moment(data.dataNext).format('YYYY-MM-DD');
+        
+        // Deixe o valor unitário como opcional
+        if (data.valorUnitario === '') {
+          data.valorUnitario = null;
+        }
+        
         const response = await axios[method](url, data);
         alert(response.data.message);
         setNewEstoque({});
@@ -291,7 +294,7 @@
         alert(errorMessage);
       }
     };
-
+    
     const requestSort = (key) => {
       let direction = 'asc';
       if (sortConfig.key === key && sortConfig.direction === 'asc') {
@@ -311,7 +314,7 @@
       setNewEstoque(estoque[index]);
       setEditingIndex(index);
       setIsAdding(true);
-      setNewEstoque(prevState => ({ ...prevState, criadoPor: username })); // Atualiza o criadoPor ao editar
+      setNewEstoque(prevState => ({ ...prevState, alteradoPor: username }));
     };
 
     const handleFileChange = (e) => {
@@ -368,7 +371,8 @@
               entradaContabil: item['Entrada Contábil'] || '',
               garantia: item.Garantia || '',
               comodato: item.Comodato === 'Sim' ? 'Sim' : 'Não',
-              criadoPor: getCookie('username') || '',
+              criadoPor:'',
+              alteradoPor: getCookie('username') || '',
               dataModificacao: ''
             };
           });
@@ -479,7 +483,8 @@
         entradaContabil: '',
         garantia: '',
         comodato: false,
-        criadoPor: username, // Redefina o campo criadoPor
+        criadoPor: username,
+        alteradoPor:'',
         dataCriacao: '',
         dataModificacao: ''
       });
@@ -627,7 +632,12 @@
                                 <td>{item.comodato === 'Sim' ? 'Sim' : 'Não'}</td>
                               </tr>
                               <tr>
-                                <td><strong>Criado Por:</strong> {item.criadoPor}</td>
+                                <td><strong>Criado Por:</strong></td>
+                                  <td>{item.criadoPor[0]}</td>
+                              </tr>
+                              <tr>
+                                <td><strong>Alterado Por:</strong></td>
+                                <td>{item.alteradoPor}</td>
                               </tr>
                             </tbody>
                           </table>
@@ -867,15 +877,6 @@
                   <option value="Não">Não</option>
                 </select>
               </label>
-              <label>
-                  Criado Por:
-                  <input
-                    type="text"
-                    name="criadoPor"
-                    value={username} // Bind directly to the username
-                    readOnly // Keep it read-only if you want to prevent editing
-                  />
-                </label>
               <div className="button-container">
                 <button type="submit" className="submit">
                   {editingIndex !== null ? 'Atualizar' : 'Adicionar'}
