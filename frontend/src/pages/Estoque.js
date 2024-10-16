@@ -71,7 +71,7 @@
     const handleExport = async () => {
       setIsExporting(true);
       try {
-        const response = await axios.get('http://localhost:5001/inventario');
+        const response = await axios.get('http://mao-s038:5001/inventario');
         const data = response.data;
         const filteredData = data.filter(item => {
           const createdAt = moment(item.dataCriacao);
@@ -159,7 +159,7 @@
     
     const downloadByPeriod = async () => {
       try {
-        const response = await axios.get('http://localhost:5001/inventario');
+        const response = await axios.get('http://mao-s038:5001/inventario');
         const data = response.data;
         const filteredData = data.filter(item => {
           const createdAt = moment(item.dataCriacao);
@@ -233,7 +233,7 @@
 
   const getEstoque = async () => {
       try {
-        const response = await axios.get('http://localhost:5001/inventario');
+        const response = await axios.get('http://mao-s038:5001/inventario');
         setEstoque(response.data);
       } catch (error) {
         console.error('Erro ao obter os dados:', error);
@@ -261,7 +261,7 @@
         const compartilhada = newEstoque.compartilhada === 'Sim' ? 'Sim' : 'Não';
         const comodato = newEstoque.comodato === 'Sim' ? 'Sim' : 'Não';
         const method = editingIndex !== null ? 'put' : 'post';
-        const url = editingIndex !== null ? `http://localhost:5001/inventario/${newEstoque.patrimonio}` : 'http://localhost:5001/inventario';
+        const url = editingIndex !== null ? `http://localhost:5001/inventario/${newEstoque.patrimonio}` : 'http://mao-s038:5001/inventario';
         
         const data = {
           ...newEstoque,
@@ -384,7 +384,7 @@
           }
     
           try {
-            const response = await axios.post('http://localhost:50010/inventario/importar', formattedData);
+            const response = await axios.post('http://mao-s038:50010/inventario/importar', formattedData);
             console.log('Dados importados com sucesso:', response.data);
             alert('Dados importados com sucesso!');
             getEstoque();

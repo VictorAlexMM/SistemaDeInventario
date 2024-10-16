@@ -20,7 +20,7 @@ function logSystemInfo() {
     };
 
     // Envia as informações para o servidor API
-    axios.post('http://localhost:3001/api/system-info', logMessage)
+    axios.post('http://mao-s038:3001/api/system-info', logMessage)
       .then(response => console.log('Info sent to API Server:', response.data))
       .catch(error => console.error('Error sending info to API Server:', error));
   });
