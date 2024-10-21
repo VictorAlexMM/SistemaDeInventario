@@ -6,6 +6,7 @@ import Login from './pages/Login';
 import Licencas from './pages/Licencas';
 import Estoque from './pages/Estoque';
 import Comodato from './pages/Comodato';
+import PainelControl from './pages/PainelControl'
 
 import './styles/App.css';
 
@@ -36,6 +37,7 @@ function App() {
         <Route path="/portal/licencas" element={<Layout><Licencas /></Layout>} />
         <Route path="/portal/inventario" element={<Layout><Estoque /></Layout>} />
         <Route path="/portal/comodato" element={<Layout><Comodato /></Layout>} />
+        <Route path="/portal/painel" element={<Layout><PainelControl /></Layout>} />
       </Routes>
     </Router>
   );

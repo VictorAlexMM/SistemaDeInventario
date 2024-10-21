@@ -7,10 +7,11 @@ const NavBar = () => {
 
   const handleLogout = async () => {
     try {
-      localStorage.removeItem('loggedUser'); // Remove o usuário logado do armazenamento local
-      navigate('/', { replace: true }); // Redireciona para a página de Login
+      localStorage.removeItem('loggedUser '); 
     } catch (error) {
-      console.error('Erro ao sair:', error); // Log de erro caso algo dê errado
+      console.error('Erro ao sair:', error); 
+    } finally {
+      navigate('/', { replace: true }); 
     }
   };
 

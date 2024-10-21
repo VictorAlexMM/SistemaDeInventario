@@ -11,16 +11,38 @@ const Login = () => {
   const [loading, setLoading] = useState(false); // Estado para controle de loading
 
   useEffect(() => {
-    const loggedUser  = localStorage.getItem('loggedUser ');
+    const loggedUser  = localStorage.getItem('loggedUser '); // Removido espaço
     if (loggedUser ) {
       const parsedLoggedUser  = JSON.parse(loggedUser );
       navigate('/portal/inventario', { state: { logged: parsedLoggedUser  } });
     }
   }, [navigate]);
 
+  // Função para validar se o username existe
+  const validateUsername = async (username) => {
+    try {
+      const response = await axios.post('http://localhost:5000/validateUser', { // Removido espaço
+        username,
+      });
+      return response.data.valid; // Verifica se a resposta da API indica que o usuário é válido
+    } catch (error) {
+      setError('Erro ao validar username');
+      return false;
+    }
+  };
+
   const handleLogin = async () => {
     setError(null);
     setLoading(true); // Inicia o loading
+
+    // Validação do username
+    const isUsernameValid = await validateUsername(username);
+    if (!isUsernameValid) {
+      setError('Username não encontrado');
+      setLoading(false); // Finaliza o loading
+      return;
+    }
+
     try {
       await new Promise(resolve => setTimeout(resolve, 1000)); // Simula espera
       const response = await axios.post('http://10.0.11.55:31636/api/v1/AuthAd', {
@@ -29,11 +51,10 @@ const Login = () => {
       });
 
       const data = response.data;
-      localStorage.setItem('loggedUser ', JSON.stringify({ username }));
+      localStorage.setItem('loggedUser ', JSON.stringify({ username })); // Removido espaço
       navigate('/portal/inventario', { state: { logged: { username } } });
     } catch (error) {
       if (error.response) {
-        // Se a resposta da API indicar um erro
         setError(error.response.data.error || 'Erro ao fazer login');
       } else {
         setError('Erro ao fazer login');

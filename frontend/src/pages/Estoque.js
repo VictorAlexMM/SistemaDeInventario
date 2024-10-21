@@ -1,4 +1,4 @@
-  import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
   import '../pages/Estoque.css';
   import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
   import { faPlus, faUpload, faEdit, faTimes, faChevronDown, faChevronUp } from '@fortawesome/free-solid-svg-icons';
@@ -57,21 +57,21 @@
     const [username, setUsername] = useState('');
     
     useEffect(() => {
-      const loggedUser = localStorage.getItem('loggedUser');
-      if (loggedUser) {
+      const loggedUser = localStorage.getItem('loggedUser ');
+      if (loggedUser ) {
         try {
-          const user = JSON.parse(loggedUser); // Assume que loggedUser é um objeto JSON
+          const user = JSON.parse(loggedUser ); // Assume que loggedUser é um objeto JSON
           setUsername(user.username); // Supondo que loggedUser tem uma propriedade 'username'
           setNewEstoque((prevState) => ({ ...prevState, criadoPor: user.username }));
         } catch (error) {
-          console.error('Erro ao analisar loggedUser:', error);
+          console.error('Erro ao analisar loggedUser :', error);
         }
       }
     }, []);
     const handleExport = async () => {
       setIsExporting(true);
       try {
-        const response = await axios.get('http://mao-s038:5001/inventario');
+        const response = await axios.get('http://localhost:5001/inventario');
         const data = response.data;
         const filteredData = data.filter(item => {
           const createdAt = moment(item.dataCriacao);
@@ -159,7 +159,7 @@
     
     const downloadByPeriod = async () => {
       try {
-        const response = await axios.get('http://mao-s038:5001/inventario');
+        const response = await axios.get('http://localhost:5001/inventario');
         const data = response.data;
         const filteredData = data.filter(item => {
           const createdAt = moment(item.dataCriacao);
@@ -233,7 +233,7 @@
 
   const getEstoque = async () => {
       try {
-        const response = await axios.get('http://mao-s038:5001/inventario');
+        const response = await axios.get('http://localhost:5001/inventario');
         setEstoque(response.data);
       } catch (error) {
         console.error('Erro ao obter os dados:', error);
@@ -258,31 +258,39 @@
     const handleSubmit = async (e) => {
       e.preventDefault();
       try {
+        // Verificar se o patrimônio já existe no servidor
+        const existeResponse = await axios.get(`http://localhost:5001/inventario/existe/${newEstoque.patrimonio}`);
+        
+        // Se o patrimônio existe e não estamos editando, mostra alerta
+        if (existeResponse.data.existe && editingIndex === null) {
+          alert('Erro: Patrimônio já existe.');
+          return; // Não prosseguir com a inserção
+        }
+    
         const compartilhada = newEstoque.compartilhada === 'Sim' ? 'Sim' : 'Não';
         const comodato = newEstoque.comodato === 'Sim' ? 'Sim' : 'Não';
         const method = editingIndex !== null ? 'put' : 'post';
-        const url = editingIndex !== null ? `http://localhost:5001/inventario/${newEstoque.patrimonio}` : 'http://mao-s038:5001/inventario';
-        
+        const url = editingIndex !== null ? `http://localhost:5001/inventario/${newEstoque.patrimonio}` : 'http://localhost:5001/inventario';
+    
         const data = {
           ...newEstoque,
           compartilhada: compartilhada,
           criadoPor: username, 
           comodato: comodato,
-
           alteradoPor: username,
         };
-        
-        // Deixe a data como opcional
+    
+        // Formatar datas como opcional
         if (data.dataNf) data.dataNf = moment(data.dataNf).format('YYYY-MM-DD');
         if (data.dataRecebimento) data.dataRecebimento = moment(data.dataRecebimento).format('YYYY-MM-DD');
         if (data.dataEntradaFiscal) data.dataEntradaFiscal = moment(data.dataEntradaFiscal).format('YYYY-MM-DD');
         if (data.dataNext) data.dataNext = moment(data.dataNext).format('YYYY-MM-DD');
-        
-        // Deixe o valor unitário como opcional
+    
+        // Definir valor unitário como opcional
         if (data.valorUnitario === '') {
           data.valorUnitario = null;
         }
-        
+    
         const response = await axios[method](url, data);
         alert(response.data.message);
         setNewEstoque({});
@@ -294,7 +302,6 @@
         alert(errorMessage);
       }
     };
-    
     const requestSort = (key) => {
       let direction = 'asc';
       if (sortConfig.key === key && sortConfig.direction === 'asc') {
@@ -384,7 +391,7 @@
           }
     
           try {
-            const response = await axios.post('http://mao-s038:50010/inventario/importar', formattedData);
+            const response = await axios.post('http://localhost:50010/inventario/importar', formattedData);
             console.log('Dados importados com sucesso:', response.data);
             alert('Dados importados com sucesso!');
             getEstoque();
