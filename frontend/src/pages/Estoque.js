@@ -10,9 +10,10 @@ import React, { useState, useEffect } from 'react';
   import { jwtDecode } from 'jwt-decode';
 
   function Estoque() {
-    const [estoque, setEstoque] = useState([]);
+    const [estoque, setEstoque] = useState([]);;
     const [isAdding, setIsAdding] = useState(false);
     const [isImporting, setIsImporting] = useState(false);
+    const [loadingPDF, setLoadingPDF] = useState(false);
     const [isExporting, setIsExporting] = useState(false);
     const [editingIndex, setEditingIndex] = useState(null);
     const [downloadOption, setDownloadOption] = useState('completo');
@@ -55,6 +56,8 @@ import React, { useState, useEffect } from 'react';
     const [startDate, setStartDate] = useState('');
     const [endDate, setEndDate] = useState('');
     const [username, setUsername] = useState('');
+    const [pdfUrl, setPdfUrl] = useState(''); // URL do PDF
+    const [isPdfModalOpen, setIsPdfModalOpen] = useState(false); // Estado do modal do PDF  
     
     useEffect(() => {
       const loggedUser = localStorage.getItem('loggedUser ');
@@ -79,7 +82,7 @@ import React, { useState, useEffect } from 'react';
         });
         const csvData = filteredData.map(item => {
           return {
-            Patrimonio: item.patrimonio,
+            Patrimonio: item.Patrimonio,
             Empresa: item.empresa,
             Setor: item.setor,
             CentroDeCusto: item.centroDeCusto,
@@ -125,7 +128,7 @@ import React, { useState, useEffect } from 'react';
     };
     
     const filteredEstoque = estoque.filter(item =>
-      item.patrimonio.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      item.Patrimonio.toLowerCase().includes(searchTerm.toLowerCase()) ||
       item.centroDeCusto.toLowerCase().includes(searchTerm.toLowerCase()) ||
       item.marca.toLowerCase().includes(searchTerm.toLowerCase()) ||
       item.modelo .toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -167,7 +170,7 @@ import React, { useState, useEffect } from 'react';
         });
         const csvData = filteredData.map(item => {
           return {
-            Patrimonio: item.patrimonio,
+            Patrimonio: item.Patrimonio,
             Empresa: item.empresa,
             Setor: item.setor,
             CentroDeCusto: item.centroDeCusto,
@@ -385,7 +388,7 @@ import React, { useState, useEffect } from 'react';
           });
     
           // Verifique os dados
-          if (!formattedData.every(item => item.patrimonio && item.empresa && item.setor && item.centroDeCusto)) {
+          if (!formattedData.every(item => item.Patrimonio && item.empresa && item.setor && item.centroDeCusto)) {
             alert('Erro: Dados inválidos. Por favor, verifique os dados e tente novamente.');
             return;
           }
@@ -429,6 +432,39 @@ import React, { useState, useEffect } from 'react';
       document.body.removeChild(link);
     };
 
+    const checkPDFExists = async (patrimonio) => {
+      try {
+        const response = await fetch(`/check-pdfs`);
+        if (!response.ok) {
+          throw new Error('Erro ao verificar PDFs');
+        }
+        const data = await response.json();
+        return data.pdfFiles.includes(`${patrimonio}.pdf`);
+      } catch (error) {
+        console.error('Erro ao verificar PDF:', error);
+        alert('Erro ao verificar PDF. Tente novamente mais tarde.');
+        return false;
+      }
+    };
+  
+    const viewPDF = async (patrimonio) => {
+      const response = await fetch(`/comodato/pdf/${patrimonio}`);
+      
+      if (response.ok) {
+          const blob = await response.blob();
+          const url = window.URL.createObjectURL(blob);
+          setPdfUrl(url); // Define a URL do PDF
+          setIsPdfModalOpen(true); // Abre o modal
+      } else {
+          console.error('Erro ao visualizar PDF:', response.statusText);
+          alert('Erro ao visualizar PDF. Verifique se o arquivo existe.');
+      }
+  };
+
+  const closePdfModal = () => {
+    setIsPdfModalOpen(false);
+    setPdfUrl(''); // Limpa a URL do PDF
+};
     const downloadFilledCSV = () => {
       if (estoque.length === 0) {
         alert('Não há dados preenchidos para exportar.');
@@ -444,7 +480,7 @@ import React, { useState, useEffect } from 'react';
 
       const csvRows = estoque.map(item =>
         [
-          item.patrimonio, item.empresa, item.setor, item.centroDeCusto, item.tipo,
+          item.Patrimonio, item.empresa, item.setor, item.centroDeCusto, item.tipo,
           item.marca, item.modelo, item.office, item.compartilhada ? 'Sim' : 'Não',
           item.usuarios, item.planta, item.tipoCompra, item.fornecedor, item.nf,
           item.dataNf, item.valorUnitario, item.dataRecebimento, item.chamadoFiscal,
@@ -557,7 +593,7 @@ import React, { useState, useEffect } from 'react';
               {sortData(filteredEstoque, sortCriteria, sortOrder).map((item, index) => (
                 <React.Fragment key={index}>
                   <tr>
-                    <td>{item.patrimonio}</td>
+                    <td>{item.Patrimonio}</td>
                     <td>{item.empresa}</td>
                     <td>{item.setor}</td>
                     <td>{item.centroDeCusto}</td>
@@ -636,8 +672,12 @@ import React, { useState, useEffect } from 'react';
                               </tr>
                               <tr>
                                 <td><strong>Comodato:</strong></td>
-                                <td>{item.comodato === 'Sim' ? 'Sim' : 'Não'}</td>
-                              </tr>
+                                <td colSpan="2">
+                                <button onClick={() => viewPDF(item.Patrimonio)} disabled={loadingPDF}>
+                                  {loadingPDF ? 'Carregando...' : `Visualizar PDF (${item.Patrimonio}.pdf)`}
+                                </button>
+                                </td>
+                            </tr>
                               <tr>
                                 <td><strong>Criado Por:</strong></td>
                                   <td>{item.criadoPor[0]}</td>
@@ -657,7 +697,15 @@ import React, { useState, useEffect } from 'react';
             </tbody>
           </table>
         </div>
-
+        {isPdfModalOpen && (
+              <div className="pdf-modal">
+                  <div className="pdf-modal-content">
+                      <span className="close" onClick={closePdfModal}>&times;</span>
+                      <iframe src={pdfUrl} style={{ width: '100%', height: '600px' }} frameBorder="0"></iframe>
+                      <a href={pdfUrl} download className="download-button">Baixar PDF</a>
+                  </div>
+              </div>
+          )}  
         {isAdding && (
           <div className="add-edit-form-modal">
             <form onSubmit={handleSubmit}>

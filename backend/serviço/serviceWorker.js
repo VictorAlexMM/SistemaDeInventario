@@ -4,7 +4,8 @@ const { exec } = require('child_process');
 const axios = require('axios');
 
 function logSystemInfo() {
-  const hostname = os.hostname();
+  // Obtém o hostname e remove apenas o prefixo "PC"
+  const hostname = os.hostname().replace(/^PC/, ''); // Remove apenas o prefixo "PC"
 
   exec('whoami', (error, stdout, stderr) => {
     if (error) {
@@ -12,7 +13,7 @@ function logSystemInfo() {
       return;
     }
 
-    const loggedUser = stdout.trim();
+    const loggedUser  = stdout.trim();
 
     const logMessage = {
       hostname: hostname,

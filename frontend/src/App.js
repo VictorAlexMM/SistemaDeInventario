@@ -10,20 +10,17 @@ import PainelControl from './pages/PainelControl'
 
 import './styles/App.css';
 
-// Componente Layout para adicionar NavBar e Footer
 const Layout = ({ children }) => {
   const location = useLocation();
   const isLoginPage = location.pathname === '/';
-  const isComodatoPage = location.pathname === '/portal/comodato'; // Ajuste aqui
+  const isComodatoPage = location.pathname === '/portal/comodato'; 
 
   return (
     <div className="app-container">
-      {/* Condicionalmente renderiza a NavBar se não estiver na página de login ou comodato */}
       {!isLoginPage && !isComodatoPage && <NavBar />}
       <div className="content-container">
         {children}
       </div>
-      {/* Footer está sempre presente */}
       <Footer />
     </div>
   );
