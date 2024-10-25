@@ -14,7 +14,7 @@ const Login = () => {
     const loggedUser  = localStorage.getItem('loggedUser '); // Removido espaço
     if (loggedUser ) {
       const parsedLoggedUser  = JSON.parse(loggedUser );
-      navigate('/portal/inventario', { state: { logged: parsedLoggedUser  } });
+      navigate('/portal/Home', { state: { logged: parsedLoggedUser  } });
     }
   }, [navigate]);
 
@@ -52,7 +52,7 @@ const Login = () => {
 
       const data = response.data;
       localStorage.setItem('loggedUser ', JSON.stringify({ username })); // Removido espaço
-      navigate('/portal/inventario', { state: { logged: { username } } });
+      navigate('/portal/Home', { state: { logged: { username } } });
     } catch (error) {
       if (error.response) {
         setError(error.response.data.error || 'Erro ao fazer login');

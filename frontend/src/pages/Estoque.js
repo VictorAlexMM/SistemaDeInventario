@@ -74,7 +74,7 @@ import React, { useState, useEffect } from 'react';
     const handleExport = async () => {
       setIsExporting(true);
       try {
-        const response = await axios.get('http://localhost:5001/inventario');
+        const response = await axios.get('http://localhost:3003/inventario');
         const data = response.data;
         const filteredData = data.filter(item => {
           const createdAt = moment(item.dataCriacao);
@@ -162,7 +162,7 @@ import React, { useState, useEffect } from 'react';
     
     const downloadByPeriod = async () => {
       try {
-        const response = await axios.get('http://localhost:5001/inventario');
+        const response = await axios.get('http://localhost:3003/inventario');
         const data = response.data;
         const filteredData = data.filter(item => {
           const createdAt = moment(item.dataCriacao);
@@ -236,7 +236,7 @@ import React, { useState, useEffect } from 'react';
 
   const getEstoque = async () => {
       try {
-        const response = await axios.get('http://localhost:5001/inventario');
+        const response = await axios.get('http://localhost:3003/inventario');
         setEstoque(response.data);
       } catch (error) {
         console.error('Erro ao obter os dados:', error);
@@ -262,7 +262,7 @@ import React, { useState, useEffect } from 'react';
       e.preventDefault();
       try {
         // Verificar se o patrimônio já existe no servidor
-        const existeResponse = await axios.get(`http://localhost:5001/inventario/existe/${newEstoque.patrimonio}`);
+        const existeResponse = await axios.get(`http://localhost:3003/inventario/existe/${newEstoque.patrimonio}`);
         
         // Se o patrimônio existe e não estamos editando, mostra alerta
         if (existeResponse.data.existe && editingIndex === null) {
@@ -273,7 +273,7 @@ import React, { useState, useEffect } from 'react';
         const compartilhada = newEstoque.compartilhada === 'Sim' ? 'Sim' : 'Não';
         const comodato = newEstoque.comodato === 'Sim' ? 'Sim' : 'Não';
         const method = editingIndex !== null ? 'put' : 'post';
-        const url = editingIndex !== null ? `http://localhost:5001/inventario/${newEstoque.patrimonio}` : 'http://localhost:5001/inventario';
+        const url = editingIndex !== null ? `http://localhost:3003/inventario/${newEstoque.patrimonio}` : 'http://localhost:3003/inventario';
     
         const data = {
           ...newEstoque,
@@ -394,7 +394,7 @@ import React, { useState, useEffect } from 'react';
           }
     
           try {
-            const response = await axios.post('http://localhost:50010/inventario/importar', formattedData);
+            const response = await axios.post('http://localhost:30030/inventario/importar', formattedData);
             console.log('Dados importados com sucesso:', response.data);
             alert('Dados importados com sucesso!');
             getEstoque();
@@ -434,32 +434,43 @@ import React, { useState, useEffect } from 'react';
 
     const checkPDFExists = async (patrimonio) => {
       try {
-        const response = await fetch(`/check-pdfs`);
-        if (!response.ok) {
-          throw new Error('Erro ao verificar PDFs');
-        }
-        const data = await response.json();
-        return data.pdfFiles.includes(`${patrimonio}.pdf`);
+          const response = await fetch(`http://localhost:3003/check-pdfs/${patrimonio}`);
+          const text = await response.text(); // Lê a resposta como texto
+          console.log('Resposta do servidor:', text); // Verifique o que está sendo retornado
+          const data = JSON.parse(text); // Tente analisar como JSON
+          return data.exists; 
       } catch (error) {
-        console.error('Erro ao verificar PDF:', error);
-        alert('Erro ao verificar PDF. Tente novamente mais tarde.');
-        return false;
-      }
-    };
-  
-    const viewPDF = async (patrimonio) => {
-      const response = await fetch(`/comodato/pdf/${patrimonio}`);
-      
-      if (response.ok) {
-          const blob = await response.blob();
-          const url = window.URL.createObjectURL(blob);
-          setPdfUrl(url); // Define a URL do PDF
-          setIsPdfModalOpen(true); // Abre o modal
-      } else {
-          console.error('Erro ao visualizar PDF:', response.statusText);
-          alert('Erro ao visualizar PDF. Verifique se o arquivo existe.');
+          console.error('Erro ao verificar PDF:', error);
+          alert('Erro ao verificar PDF. Tente novamente mais tarde.');
+          return false;
       }
   };
+  
+  const viewPDF = async (patrimonio) => {
+    
+    // Verifica se o PDF existe
+    const pdfExists = await checkPDFExists(patrimonio);
+    
+    if (!pdfExists) {
+        alert('PDF não encontrado.');
+        return;
+    }
+
+    try {
+        const response = await fetch(`http://localhost:3003/comodato/pdf/${patrimonio}`);
+        if (response.ok) {
+            const blob = await response.blob();
+            const url = window.URL.createObjectURL(blob);
+            setPdfUrl(url); // Define a URL do PDF
+            setIsPdfModalOpen(true); // Abre o modal
+        } else {
+            throw new Error('Erro ao carregar o PDF.');
+        }
+    } catch (error) {
+        console.error('Erro ao visualizar PDF:', error);
+        alert('Erro ao visualizar PDF. Verifique se o arquivo existe.');
+    }
+};
 
   const closePdfModal = () => {
     setIsPdfModalOpen(false);
@@ -698,14 +709,14 @@ import React, { useState, useEffect } from 'react';
           </table>
         </div>
         {isPdfModalOpen && (
-              <div className="pdf-modal">
-                  <div className="pdf-modal-content">
-                      <span className="close" onClick={closePdfModal}>&times;</span>
-                      <iframe src={pdfUrl} style={{ width: '100%', height: '600px' }} frameBorder="0"></iframe>
-                      <a href={pdfUrl} download className="download-button">Baixar PDF</a>
-                  </div>
-              </div>
-          )}  
+            <div className="pdf-modal">
+                <div className="pdf-modal-content">
+                    <span className="close" onClick={closePdfModal}>&times;</span>
+                    <iframe src={pdfUrl} style={{ width: '100%', height: '600px' }} frameBorder="0"></iframe>
+                    <a href={pdfUrl} download className="download-button">Baixar PDF</a>
+                </div>
+            </div>
+        )}
         {isAdding && (
           <div className="add-edit-form-modal">
             <form onSubmit={handleSubmit}>

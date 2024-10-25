@@ -7,12 +7,14 @@ import Estoque from './components/Estoque';
 import PainelControl from './pages/PainelControl'
 import './styles/App.css';
 import Comodato from './pages/Comodato';
+import Home from './pages/Home';
 
 function App() {
   return (
     <Router>
       <Routes>
         <Route path="/" element={<Login />} />
+        <Route path="/portal/Home" element={<Home />} />
         <Route path="/portal/licencas" element={<Licencas />} />
         <Route path="/portal/inventario" element={<Estoque />} />
         <Route path="/portal/comodato" element={<Comodato/>}/>

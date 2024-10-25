@@ -180,33 +180,40 @@ app.post('/comodato', async (req, res) => {
   }
 });
 
-  app.get('/check-pdfs', async (req, res) => {
-    const directoryPath = 'C:\\PORTAL38'; // Caminho do diretório
+// Endpoint para verificar PDF específico
+app.get('/check-pdfs/:patrimonio', async (req, res) => {
+  const { patrimonio } = req.params;
+  const pdfFilePath = path.join('C:\\PORTAL38', `${patrimonio}.pdf`);
 
-    console.log('Verificando PDFs em:', directoryPath); // Log para verificar o caminho do diretório
-
-    try {
-        fs.readdir(directoryPath, (err, files) => {
-            if (err) {
-                console.error('Erro ao ler o diretório:', err);
-                return res.status(500).json({ message: 'Erro ao ler o diretório.' });
-            }
-
-            const pdfFiles = files.filter(file => path.extname(file).toLowerCase() === '.pdf');
-            console.log('Arquivos PDF encontrados:', pdfFiles); // Log dos arquivos encontrados
-            res.json({ pdfFiles }); // Retorna um objeto JSON com os arquivos PDF encontrados
-        });
-    } catch (error) {
-        console.error('Erro ao verificar PDFs:', error);
-        res.status(500).json({ message: 'Erro ao verificar PDFs.' });
-    }
+  try {
+      fs.access(pdfFilePath, fs.constants.F_OK, (err) => {
+          if (err) {
+              return res.status(404).json({ exists: false });
+          }
+          return res.json({ exists: true });
+      });
+  } catch (error) {
+      console.error('Erro ao verificar PDF:', error);
+      res.status(500).json({ message: 'Erro ao verificar PDF.' });
+  }
 });
+
+// Endpoint para listar todos os PDFs
+app.get('/comodato/pdf/:patrimonio', (req, res) => {
+  const { patrimonio } = req.params;
+  const pdfFilePath = path.join('C:\\PORTAL38', `${patrimonio}.pdf`);
+
+  res.sendFile(pdfFilePath, (err) => {
+      if (err) {
+          res.status(err.status).end();
+      }
+  });
+});
+
 
 app.get('/comodato/pdf/:patrimonio', async (req, res) => {
   const { patrimonio } = req.params;
   const filePath = path.join('C:\\PORTAL38', `${patrimonio}.pdf`);
-
-  console.log(`Tentando enviar PDF em: ${filePath}`);
 
   try {
     if (!fs.existsSync(filePath)) {
@@ -230,6 +237,7 @@ app.get('/comodato/pdf/:patrimonio', async (req, res) => {
     res.status(500).send('Erro ao verificar PDF.');
   }
 });
+
 
 app.post('/inventario', async (req, res) => {
   try {
@@ -731,8 +739,74 @@ app.get('/inventario/exportar', async (req, res) => {
   }
 });
 
+// Endpoint para obter contagem de equipamentos e comodatos
+app.get('/dashboard/contagem', async (req, res) => {
+  try {
+    if (!pool) throw new Error('Banco de dados não conectado.');
+
+    const request = pool.request();
+
+    // Consulta para contar o número de switches, desktops e notebooks
+    const inventarioQuery = `
+      SELECT 
+        SUM(CASE WHEN tipo = 'Switch' THEN 1 ELSE 0 END) AS total_switches,
+        SUM(CASE WHEN tipo = 'Desktop' THEN 1 ELSE 0 END) AS total_desktops,
+        SUM(CASE WHEN tipo = 'Notebook' THEN 1 ELSE 0 END) AS total_notebooks
+      FROM controleInventario;
+    `;
+
+    // Consulta para contar o número de comodatos
+    const comodatoQuery = `
+      SELECT COUNT(*) AS total_comodatos FROM comodato;
+    `;
+
+    // Executa as duas consultas
+    const inventarioResult = await request.query(inventarioQuery);
+    const comodatoResult = await request.query(comodatoQuery);
+
+    // Monta a resposta com os dados
+    const response = {
+      total_switches: inventarioResult.recordset[0].total_switches,
+      total_desktops: inventarioResult.recordset[0].total_desktops,
+      total_notebooks: inventarioResult.recordset[0].total_notebooks,
+      total_comodatos: comodatoResult.recordset[0].total_comodatos,
+    };
+
+    res.json(response);
+  } catch (error) {
+    console.error('Erro ao obter contagem:', error);
+    res.status(500).json({ error: 'Erro ao obter contagem.' });
+  }
+});
+
+
+// Endpoint para obter as últimas alterações na tabela controleInventario
+app.get('/api/controleInventario/ultimas-alteracoes', (req, res) => {
+  const query = `
+    SELECT TOP 10 
+      patrimonio,
+      modelo,
+      marca,
+      dataCriacao AS data, 
+      criadoPor, 
+      alteradoPor 
+    FROM 
+      controleInventario 
+    ORDER BY 
+      dataCriacao DESC
+  `;
+
+  pool.request().query(query, (err, results) => {
+    if (err) {
+      console.error('Erro ao buscar alterações:', err);
+      return res.status(500).json({ error: 'Erro ao buscar alterações' });
+    }
+    res.json(results.recordset);
+  });
+});
+
 // Iniciar o servidor
-const PORT = process.env.PORT || 5001;
+const PORT = process.env.PORT || 3003;
 app.listen(PORT, () => {
   console.log(`Servidor rodando na porta ${PORT}`);
 });
