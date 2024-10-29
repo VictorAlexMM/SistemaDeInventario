@@ -17,7 +17,7 @@ const NavBar = () => {
 
   return (
     <nav className="navbar">
-      <Link to="/portal/licencas">Licenças</Link>
+      <Link to="/portal/Home">Home</Link>
       <Link to="/portal/inventario">Inventário</Link>
       <Link to="/portal/comodato">Comodato</Link>
       <button onClick={handleLogout} className="logout-button">Sair</button>

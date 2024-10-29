@@ -7,7 +7,6 @@ import React, { useState, useEffect } from 'react';
   import { getCookie } from '../utils/cookieUtils';
   import moment from 'moment'; 
   import axios from 'axios';
-  import { jwtDecode } from 'jwt-decode';
 
   function Estoque() {
     const [estoque, setEstoque] = useState([]);;
@@ -18,7 +17,7 @@ import React, { useState, useEffect } from 'react';
     const [editingIndex, setEditingIndex] = useState(null);
     const [downloadOption, setDownloadOption] = useState('completo');
     const [newEstoque, setNewEstoque] = useState({
-      patrimonio: '',
+      Patrimonio: '',
       empresa: '',
       setor: '',
       centroDeCusto: '',
@@ -262,18 +261,16 @@ import React, { useState, useEffect } from 'react';
       e.preventDefault();
       try {
         // Verificar se o patrimônio já existe no servidor
-        const existeResponse = await axios.get(`http://localhost:3003/inventario/existe/${newEstoque.patrimonio}`);
-        
-        // Se o patrimônio existe e não estamos editando, mostra alerta
+        const existeResponse = await axios.get(`http://localhost:3003/inventario/existe/${newEstoque.Patrimonio}`);
         if (existeResponse.data.existe && editingIndex === null) {
           alert('Erro: Patrimônio já existe.');
-          return; // Não prosseguir com a inserção
+          return;
         }
     
         const compartilhada = newEstoque.compartilhada === 'Sim' ? 'Sim' : 'Não';
         const comodato = newEstoque.comodato === 'Sim' ? 'Sim' : 'Não';
         const method = editingIndex !== null ? 'put' : 'post';
-        const url = editingIndex !== null ? `http://localhost:3003/inventario/${newEstoque.patrimonio}` : 'http://localhost:3003/inventario';
+        const url = editingIndex !== null ? `http://localhost:3003/inventario/${newEstoque.Patrimonio}` : 'http://localhost:3003/inventario';
     
         const data = {
           ...newEstoque,
@@ -289,7 +286,6 @@ import React, { useState, useEffect } from 'react';
         if (data.dataEntradaFiscal) data.dataEntradaFiscal = moment(data.dataEntradaFiscal).format('YYYY-MM-DD');
         if (data.dataNext) data.dataNext = moment(data.dataNext).format('YYYY-MM-DD');
     
-        // Definir valor unitário como opcional
         if (data.valorUnitario === '') {
           data.valorUnitario = null;
         }
@@ -304,20 +300,6 @@ import React, { useState, useEffect } from 'react';
         const errorMessage = error.response?.data?.error || 'Erro ao enviar os dados.';
         alert(errorMessage);
       }
-    };
-    const requestSort = (key) => {
-      let direction = 'asc';
-      if (sortConfig.key === key && sortConfig.direction === 'asc') {
-        direction = 'desc';
-      }
-      setSortConfig({ key, direction });
-    };
-
-    const getClassNameForSort = (key) => {
-      if (sortConfig.key === key) {
-        return sortConfig.direction === 'asc' ? 'asc' : 'desc';
-      }
-      return '';
     };
 
     const handleEdit = (index) => {
@@ -548,7 +530,7 @@ import React, { useState, useEffect } from 'react';
     const now = new Date().toISOString();
 
     const formatDate = (date) => {
-      return moment(date).format('YYYY-MM-DD');
+      return moment(date).format('DD-MM-YYYY');
     };
 
     return (
@@ -628,95 +610,116 @@ import React, { useState, useEffect } from 'react';
                   </tr>
                   {isCollapsibleOpen === index && (
                     <tr>
-                      <td colSpan="14">
-                        <div className="collapsible-content">
-                          <p><strong>Detalhes Adicionais:</strong></p>
-                          <table>
-                            <tbody>
-                              <tr>
-                                <td><strong>Tipo Compra:</strong></td>
-                                <td>{ item.tipoCompra}</td>
-                              </tr>
-                              <tr>
-                                <td><strong>Fornecedor:</strong></td>
-                                <td>{item.fornecedor}</td>
-                              </tr>
-                              <tr>
-                                <td><strong>NF:</strong></td>
-                                <td>{item.nf}</td>
-                              </tr>
-                              <tr>
-                                <td><strong>Data NF:</strong></td>
-                                <td>{formatDate(item.dataNf)}</td>
-                              </tr>
-                              <tr>
-                                <td><strong>Valor Unitário:</strong></td>
-                                <td>{item.valorUnitario}</td>
-                              </tr>
-                              <tr>
-                                <td><strong>Data Recebimento:</strong></td>
-                                <td>{formatDate(item.dataRecebimento)}</td>
-                              </tr>
-                              <tr>
-                                <td><strong>Chamado Fiscal:</strong></td>
-                                <td>{item.chamadoFiscal}</td>
-                              </tr>
-                              <tr>
-                                <td><strong>Data Entrada Fiscal:</strong></td>
-                                <td>{formatDate(item.dataEntradaFiscal)}</td>
-                              </tr>
-                              <tr>
-                                <td><strong>Chamado Next:</strong></td>
-                                <td>{item.chamadoNext}</td>
-                              </tr>
-                              <tr>
-                                <td><strong>Data Next:</strong></td>
-                                <td>{formatDate(item.dataNext)}</td>
-                              </tr>
-                              <tr>
-                                <td><strong>Entrada Contábil:</strong></td>
-                                <td>{item.entradaContabil}</td>
-                              </tr>
-                              <tr>
-                                <td><strong>Garantia:</strong></td>
-                                <td>{item.garantia}</td>
-                              </tr>
-                              <tr>
-                                <td><strong>Comodato:</strong></td>
-                                <td colSpan="2">
-                                <button onClick={() => viewPDF(item.Patrimonio)} disabled={loadingPDF}>
-                                  {loadingPDF ? 'Carregando...' : `Visualizar PDF (${item.Patrimonio}.pdf)`}
-                                </button>
-                                </td>
-                            </tr>
-                              <tr>
-                                <td><strong>Criado Por:</strong></td>
-                                  <td>{item.criadoPor[0]}</td>
-                              </tr>
-                              <tr>
-                                <td><strong>Alterado Por:</strong></td>
-                                <td>{item.alteradoPor}</td>
-                              </tr>
-                            </tbody>
-                          </table>
-                        </div>
-                      </td>
+                        <td colSpan="14">
+                            <div className="collapsible-content" style={{ backgroundColor: '#515151', color: '#fff', padding: '10px', borderRadius: '5px' }}>
+                                <p><strong>Detalhes Adicionais:</strong></p>
+                                <table>
+                                    <tbody>
+                                        <tr>
+                                            <td><strong>Tipo Compra:</strong></td>
+                                            <td>{item.tipoCompra}</td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Fornecedor:</strong></td>
+                                            <td>{item.fornecedor}</td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>NF:</strong></td>
+                                            <td>{item.nf}</td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Data NF:</strong></td>
+                                            <td>{formatDate(item.dataNf)}</td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Valor Unitário:</strong></td>
+                                            <td>{item.valorUnitario}</td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Data Recebimento:</strong></td>
+                                            <td>{formatDate(item.dataRecebimento)}</td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Chamado Fiscal:</strong></td>
+                                            <td>{item.chamadoFiscal}</td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Data Entrada Fiscal:</strong></td>
+                                            <td>{formatDate(item.dataEntradaFiscal)}</td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Chamado Next:</strong></td>
+                                            <td>{item.chamadoNext}</td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Data Next:</strong></td>
+                                            <td>{formatDate(item.dataNext)}</td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Entrada Contábil:</strong></td>
+                                            <td>{item.entradaContabil}</td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Garantia:</strong></td>
+                                            <td>{item.garantia}</td>
+                                        </tr>
+                                        <tr style={{ color: '#fff' }}>
+                                        <td><strong>Comodato:</strong></td>
+                                        <td colSpan="2">
+                                            <button 
+                                                onClick={() => viewPDF(item.Patrimonio)} 
+                                                disabled={loadingPDF} 
+                                                style={{ 
+                                                    color: '#000', // Texto preto para o botão
+                                                    border: '1px solid #ccc', // Borda sutil
+                                                    padding: '5px 10px', 
+                                                    borderRadius: '3px', 
+                                                    cursor: 'pointer'
+                                                }}
+                                            >
+                                                {loadingPDF ? 'Carregando...' : `Visualizar PDF (${item.Patrimonio}.pdf)`}
+                                            </button>
+                                        </td>
+                                    </tr>
+
+                                        <tr>
+                                            <td><strong>Criado Por:</strong></td>
+                                            <td>{item.criadoPor[0]}</td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Alterado Por:</strong></td>
+                                            <td>{item.alteradoPor}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </td>
                     </tr>
-                  )}
+                )}
                 </React.Fragment>
               ))}
             </tbody>
           </table>
         </div>
         {isPdfModalOpen && (
-            <div className="pdf-modal">
-                <div className="pdf-modal-content">
-                    <span className="close" onClick={closePdfModal}>&times;</span>
-                    <iframe src={pdfUrl} style={{ width: '100%', height: '600px' }} frameBorder="0"></iframe>
-                    <a href={pdfUrl} download className="download-button">Baixar PDF</a>
-                </div>
-            </div>
-        )}
+          <div className="pdf-modal" style={{ background: 'rgba(0, 0, 0, 0.5)' }}>
+              <div
+                  className="pdf-modal-content"
+                  style={{
+                      marginTop: '20px',
+                      border: '1px solid', // Ajuste a cor e a espessura aqui
+                      borderRadius: '8px', // Ajuste o raio das bordas
+                      padding: '20px 10px', // Reduz o padding lateral
+                      maxHeight: '80vh',
+                      overflowY: 'auto',
+                      background: 'transparent' // Remove o fundo
+                  }}
+              >
+                  <span className="close" onClick={closePdfModal}>&times;</span>
+                  <iframe src={pdfUrl} style={{ width: '100%', height: '600px', border: 'none' }}></iframe>
+              </div>
+          </div>
+      )}
         {isAdding && (
           <div className="add-edit-form-modal">
             <form onSubmit={handleSubmit}>
@@ -725,7 +728,7 @@ import React, { useState, useEffect } from 'react';
                 <input
                   type="text"
                   name="patrimonio"
-                  value={newEstoque.patrimonio}
+                  value={newEstoque.Patrimonio}
                   onChange={handleChange}
                   required
                   disabled={editingIndex !== null}
@@ -931,17 +934,6 @@ import React, { useState, useEffect } from 'react';
                   value={newEstoque.garantia}
                   onChange={handleChange}
                 />
-              </label>
-              <label>
-                Comodato:
-                <select
-                  name="comodato"
-                  value={newEstoque.comodato}
-                  onChange={handleChange}
-                >
-                  <option value="Sim">Sim</option>
-                  <option value="Não">Não</option>
-                </select>
               </label>
               <div className="button-container">
                 <button type="submit" className="submit">

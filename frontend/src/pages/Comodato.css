@@ -1,20 +1,24 @@
 .comodato-container {
   max-width: 800px;
-  margin: 500px auto 0; /* Adiciona margem superior para descer o container */
+  margin: 600px auto 0; /* Adiciona margem superior para descer o container */
   padding: 20px;
   font-family: Arial, sans-serif;
-  background-color: #ffffff; /* Adiciona background em branco */
+  background-color: #ffffff; /* Fundo branco */
   overflow: auto; /* Permite rolagem se o conteúdo transbordar */
   box-sizing: border-box; /* Inclui padding e border no cálculo de largura */
-  border: 1px solid #ddd; /* Adiciona borda ao container */
-  border-radius: 4px; /* Adiciona cantos arredondados ao container */
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Adiciona sombra ao container */
+  border: 1px solid #ddd; /* Borda leve */
+  border-radius: 4px; /* Cantos arredondados */
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Sombra suave */
+  transform: scale(0.8); /* Reduz o tamanho em 20% */
+  transform-origin: top; /* Define a origem da transformação */
 }
+
 
 h1 {
   text-align: center;
   margin-bottom: 20px;
-  font-size: 24px; /* Ajusta o tamanho da fonte do título */
+  font-size: 24px; /* Tamanho do título */
+  color: #333; /* Cor do título */
 }
 
 .comodato-content {
@@ -23,10 +27,10 @@ h1 {
 
 h2 {
   margin-top: 20px;
-  font-size: 18px; /* Ajusta o tamanho da fonte do subtítulo */
+  font-size: 18px; /* Tamanho do subtítulo */
+  color: #555; /* Cor do subtítulo */
 }
 
-/* Estilizando o formulário */
 .comodato-form {
   display: flex;
   flex-direction: column;
@@ -38,29 +42,41 @@ h2 {
 
 label {
   margin-bottom: 5px;
-  font-size: 16px; /* Ajusta o tamanho da fonte do label */
+  font-size: 16px; /* Tamanho da fonte do label */
+  color: #444; /* Cor do label */
 }
 
 input[type="text"] {
   padding: 10px;
-  border: 1px solid #ccc;
+  border: 1px solid #ccc; /* Borda leve */
   border-radius: 4px;
-  width: 100%; /* Garante que o input ocupe toda a largura */
+  width: 100%; /* Ocupa toda a largura */
+  font-size: 16px; /* Tamanho da fonte */
 }
 
-/* Estilo do botão de envio */
+input[type="checkbox"] {
+  margin-right: 10px;
+}
+
+.agreement {
+  display: flex;
+  align-items: center;
+}
+
 .submit-button {
   padding: 10px 15px;
-  background-color: #007bff;
+  background-color: #007bff; /* Azul do botão */
   color: white;
   border: none;
   border-radius: 4px;
   cursor: pointer;
-  width: 100%; /* Garante que o botão ocupe toda a largura */
+  width: 100%; /* Ocupa toda a largura */
+  font-size: 16px; /* Tamanho da fonte */
+  transition: background-color 0.3s; /* Transição suave */
 }
 
 .submit-button:hover {
-  background-color: #0056b3;
+  background-color: #0056b3; /* Azul mais escuro ao passar o mouse */
 }
 
 /* Estilos responsivos */
@@ -71,7 +87,11 @@ input[type="text"] {
   }
 
   h1 {
-    font-size: 1.2em; /* Reduz o tamanho da fonte em telas menores */
+    font-size: 1.5em; /* Reduz o tamanho da fonte em telas menores */
+  }
+
+  h2 {
+    font-size: 1.3em; /* Reduz o tamanho do subtítulo em telas menores */
   }
 
   .comodato-content {
@@ -79,7 +99,7 @@ input[type="text"] {
   }
   
   input[type="text"] {
-    font-size: 12px; /* Ajusta o tamanho da fonte */
+    font-size: 14px; /* Ajusta o tamanho da fonte */
   }
 
   .submit-button {

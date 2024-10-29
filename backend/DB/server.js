@@ -56,14 +56,18 @@ async function exportarInventarioCSV() {
 
     // Save table to CSV
     const request = pool.request();
-    const query = `
-      SELECT *
-      FROM controleInventario
-    `;
+    const query = `SELECT * FROM controleInventario`;
     const result = await request.query(query);
-    const csv = result.recordset.map(item => {
-      return Object.values(item).join(';');
-    }).join('\n');
+
+    // Get the column names
+    const columnNames = Object.keys(result.recordset[0]).join(';');
+
+    // Map the recordset to CSV format
+    const csv = [columnNames] // Add header
+      .concat(result.recordset.map(item => Object.values(item).join(';')))
+      .join('\n');
+
+    // Write CSV to file
     fs.writeFileSync(file, csv);
 
     console.log('Inventory exported successfully!');
@@ -96,12 +100,13 @@ setInterval(exportarInventarioCSV, 86400000); // 1 dia
 // Rota para adicionar comodato
 app.post('/comodato', async (req, res) => {
   try {
-    const { nome, matricula, centroDeCusto, setor, patrimonio, usuario } = req.body;
+    const { nome, matricula, planta, centroDeCusto, setor, patrimonio, usuario } = req.body;
 
     console.log('Dados recebidos:', req.body);
 
-    if (!nome || !matricula || !centroDeCusto || !setor || !patrimonio || !usuario) {
-      return res.status(400).json({ message: 'Erro: Todos os campos são obrigatórios.' });
+    // Verificação dos campos obrigatórios
+    if (!nome || !matricula || !centroDeCusto) {
+      return res.status(400).json({ message: 'Erro: Nome, Matrícula e Centro de Custo são obrigatórios.' });
     }
 
     const existeRequest = new mssql.Request(pool);
@@ -115,16 +120,17 @@ app.post('/comodato', async (req, res) => {
 
     const request = new mssql.Request(pool);
     const query = `
-      INSERT INTO comodato (nome, matricula, centroDeCusto, setor, patrimonio, usuario, dataCriacao)
-      VALUES (@nome, @matricula, @centroDeCusto, @setor, @patrimonio, @usuario, GETDATE());
+      INSERT INTO comodato (nome, matricula, planta, centroDeCusto, setor, patrimonio, usuario, dataCriacao)
+      VALUES (@nome, @matricula, @planta, @centroDeCusto, @setor, @patrimonio, @usuario, GETDATE());
     `;
     
     request.input('nome', mssql.VarChar, nome);
     request.input('matricula', mssql.VarChar, matricula);
+    request.input('planta', mssql.VarChar, planta); // Adicionado o campo planta
     request.input('centroDeCusto', mssql.VarChar, centroDeCusto);
-    request.input('setor', mssql.VarChar, setor);
-    request.input('patrimonio', mssql.VarChar, patrimonio);
-    request.input('usuario', mssql.VarChar, usuario);
+    request.input('setor', mssql.VarChar, setor || null); // Permitindo que setor seja opcional
+    request.input('patrimonio', mssql.VarChar, patrimonio || null); // Permitindo que patrimônio seja opcional
+    request.input('usuario', mssql.VarChar, usuario || null); // Alterado de 'user' para 'usuario'
 
     await request.query(query);
 
@@ -153,12 +159,13 @@ app.post('/comodato', async (req, res) => {
             <p>3.1. Firmado o presente e na posse do equipamento, o COMODATÁRIO assume toda e qualquer responsabilidade pela conservação e guarda do equipamento que lhe é confiado.</p>
             <p>3.2. As manutenções e reparos necessários ao equipamento serão realizados pelo COMODANTE, desde que o COMODATÁRIO comunique por escrito ao COMODANTE sobre a necessidade de manutenção ou reparo.</p>
             <div class="field"><strong>Nome:</strong> ${nome}</div>
-            <div class="field"><strong>Matrícula:</strong> ${matricula}</div>
+ <div class="field"><strong>Matrícula:</strong> ${matricula}</div>
+            <div class="field"><strong>Planta:</strong> ${planta}</div>
             <div class="field"><strong>Centro de Custo:</strong> ${centroDeCusto}</div>
-            <div class="field"><strong>Setor:</strong> ${setor}</div>
-            <div class="field"><strong>Patrimônio:</strong> ${patrimonio}</div>
-            <div class="field"><strong>Usuário:</strong> ${usuario}</div>
-            <div class="field"><strong>Data de Criação:</strong> ${dataCriacao}</div> <!-- Adicionando data e hora da criação -->
+            <div class="field"><strong>Setor:</strong> ${setor || 'N/A'}</div>
+            <div class="field"><strong>Patrimônio:</strong> ${patrimonio || 'N/A'}</div>
+            <div class="field"><strong>Usuário:</strong> ${usuario || 'N/A'}</div>
+            <div class="field"><strong>Data de Criação:</strong> ${dataCriacao}</div>
           </div>
         </body>
       </html>
@@ -167,7 +174,7 @@ app.post('/comodato', async (req, res) => {
     await page.setContent(htmlContent);
     const pdf = await page.pdf({ format: 'A4', printBackground: true });
 
-    const filePath = path.join('C:\\PORTAL38', `${patrimonio}.pdf`);
+    const filePath = path.join('C:\\PORTAL38', `${patrimonio || 'comodato'}.pdf`);
     fs.writeFileSync(filePath, pdf);
     console.log('PDF salvo em:', filePath);
 
@@ -385,9 +392,10 @@ app.post('/inventario', async (req, res) => {
     res.status(500).json({ message: 'Erro ao adicionar inventário', error: err.message });
   }
 });
+
 // Rota para atualizar inventário
-app.put('/inventario/:patrimonio', async (req, res) => {
-  const { patrimonio } = req.params;
+app.put('/inventario/:Patrimonio', async (req, res) => {
+  const { Patrimonio } = req.params;
   const {
     empresa, setor, centroDeCusto, tipo, marca, modelo,
     office, compartilhada, usuarios, planta, tipoCompra, fornecedor,
@@ -402,7 +410,7 @@ app.put('/inventario/:patrimonio', async (req, res) => {
     const request = pool.request();
 
     // Declare as variáveis que você está usando
-    request.input('patrimonio', mssql.VarChar, patrimonio);
+    request.input('Patrimonio', mssql.VarChar, Patrimonio);
     request.input('empresa', mssql.VarChar, empresa);
     request.input('setor', mssql.VarChar, setor);
     request.input('centroDeCusto', mssql.VarChar, centroDeCusto);
@@ -427,7 +435,7 @@ app.put('/inventario/:patrimonio', async (req, res) => {
     request.input('garantia', mssql.VarChar, garantia);
     const comodatoBool = comodato === 'Sim' ? 'Sim' : 'Não';
     request.input('comodato', mssql.VarChar, comodatoBool);
-    request.input('alteradoPor', mssql.VarChar, alteradoPor); // Declare alteradoPor
+    request.input('alteradoPor', mssql.VarChar, alteradoPor);
 
     const query = `
       UPDATE controleInventario SET
@@ -455,7 +463,7 @@ app.put('/inventario/:patrimonio', async (req, res) => {
         garantia = @garantia, 
         comodato = @comodato, 
         alteradoPor = @alteradoPor
-      WHERE patrimonio = @patrimonio
+      WHERE patrimonio = @Patrimonio
     `;
 
     await request.query(query);
@@ -465,6 +473,7 @@ app.put('/inventario/:patrimonio', async (req, res) => {
     res.status(500).json({ error: 'Erro ao atualizar inventário' });
   }
 });
+
 
 // Rota para verificar se o registro existe
 app.get('/inventario/existe/:patrimonio', async (req, res) => {
@@ -739,37 +748,45 @@ app.get('/inventario/exportar', async (req, res) => {
   }
 });
 
-// Endpoint para obter contagem de equipamentos e comodatos
+// Endpoint para contar equipamentos e comodatos
 app.get('/dashboard/contagem', async (req, res) => {
   try {
     if (!pool) throw new Error('Banco de dados não conectado.');
 
+    const planta = req.query.planta;
     const request = pool.request();
 
-    // Consulta para contar o número de switches, desktops e notebooks
+    // Definindo o parâmetro 'planta' uma única vez
+    request.input('planta', mssql.VarChar, planta);
+
+    // Consulta para contar equipamentos por planta
     const inventarioQuery = `
-      SELECT 
-        SUM(CASE WHEN tipo = 'Switch' THEN 1 ELSE 0 END) AS total_switches,
-        SUM(CASE WHEN tipo = 'Desktop' THEN 1 ELSE 0 END) AS total_desktops,
-        SUM(CASE WHEN tipo = 'Notebook' THEN 1 ELSE 0 END) AS total_notebooks
-      FROM controleInventario;
+    SELECT 
+      SUM(CASE WHEN tipo = 'servidor' THEN 1 ELSE 0 END) AS total_servidor,
+      SUM(CASE WHEN tipo = 'Desktop' THEN 1 ELSE 0 END) AS total_desktops,
+      SUM(CASE WHEN tipo = 'Notebook' THEN 1 ELSE 0 END) AS total_notebooks
+    FROM controleInventario
+    WHERE planta = @planta;
     `;
-
-    // Consulta para contar o número de comodatos
-    const comodatoQuery = `
-      SELECT COUNT(*) AS total_comodatos FROM comodato;
-    `;
-
-    // Executa as duas consultas
+    
+    // Executando a consulta para o inventário
     const inventarioResult = await request.query(inventarioQuery);
+    
+    // Consulta para contar comodatos por planta
+    const comodatoQuery = `
+    SELECT COUNT(*) AS total_comodatos 
+    FROM comodato
+    WHERE planta = @planta;  -- Supondo que a tabela comodato tenha uma coluna planta
+    `;
+    
+    // Executando a consulta para comodatos
     const comodatoResult = await request.query(comodatoQuery);
 
-    // Monta a resposta com os dados
     const response = {
-      total_switches: inventarioResult.recordset[0].total_switches,
-      total_desktops: inventarioResult.recordset[0].total_desktops,
-      total_notebooks: inventarioResult.recordset[0].total_notebooks,
-      total_comodatos: comodatoResult.recordset[0].total_comodatos,
+      total_servidor: inventarioResult.recordset[0].total_servidor || 0,
+      total_desktops: inventarioResult.recordset[0].total_desktops || 0,
+      total_notebooks: inventarioResult.recordset[0].total_notebooks || 0,
+      total_comodatos: comodatoResult.recordset[0].total_comodatos || 0,
     };
 
     res.json(response);
@@ -779,30 +796,46 @@ app.get('/dashboard/contagem', async (req, res) => {
   }
 });
 
-
 // Endpoint para obter as últimas alterações na tabela controleInventario
-app.get('/api/controleInventario/ultimas-alteracoes', (req, res) => {
-  const query = `
-    SELECT TOP 10 
-      patrimonio,
-      modelo,
-      marca,
-      dataCriacao AS data, 
-      criadoPor, 
-      alteradoPor 
-    FROM 
-      controleInventario 
-    ORDER BY 
-      dataCriacao DESC
-  `;
+app.get('/dashboard/recent-changes', async (req, res) => {
+  try {
+    const planta = req.query.planta;
 
-  pool.request().query(query, (err, results) => {
-    if (err) {
-      console.error('Erro ao buscar alterações:', err);
-      return res.status(500).json({ error: 'Erro ao buscar alterações' });
-    }
+    const query = `
+      SELECT TOP 10 
+        patrimonio,
+        modelo,
+        marca,
+        dataCriacao AS data, 
+        criadoPor, 
+        alteradoPor 
+      FROM controleInventario 
+      WHERE planta = @planta
+      ORDER BY dataCriacao DESC;
+    `;
+    
+    const request = pool.request();
+    request.input('planta', mssql.VarChar, planta); // Aqui deve ser mssql e não sql
+
+    const results = await request.query(query);
+
     res.json(results.recordset);
-  });
+  } catch (error) {
+    console.error('Erro ao buscar alterações:', error);
+    res.status(500).json({ error: 'Erro ao buscar alterações' });
+  }
+});
+
+// Endpoint para buscar plantas disponíveis
+app.get('/dashboard/plantas', async (req, res) => {
+  try {
+    const query = 'SELECT DISTINCT planta FROM controleInventario';
+    const result = await pool.request().query(query);
+    res.json(result.recordset);
+  } catch (error) {
+    console.error('Erro ao buscar plantas:', error);
+    res.status(500).json({ error: 'Erro ao buscar plantas' });
+  }
 });
 
 // Iniciar o servidor

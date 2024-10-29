@@ -17,9 +17,12 @@ body, html {
   display: flex;
   flex-direction: column;
   min-height: 100vh; /* Garante que o container ocupe toda a altura da tela */
+  width: 100vw; /* Garante que o container ocupe toda a largura da tela */
+  margin: 0; /* Remove margens padrão do body */
   padding: 20px; /* Ajuste conforme necessário */
   background: #333; /* Cor de fundo do app-container */
-  color: #000000; /* Cor do texto para contraste */
+  color: #ffffff; /* Cor do texto para contraste */
+  box-sizing: border-box; /* Inclui padding e border no cálculo de largura e altura */
 }
 
 .content-container {
@@ -28,21 +31,4 @@ body, html {
   padding-bottom: 60px; /* Espaço para o footer */
   background: #333; /* Cor de fundo do content-container */
   color: #000000; /* Cor do texto para contraste */
-}
-
-/* Estilos responsivos */
-@media (max-width: 768px) {
-  .content-container {
-    padding: 15px; /* Reduz padding em telas menores */
-  }
-}
-
-@media (max-width: 480px) {
-  .content-container {
-    padding: 10px; /* Aumenta a responsividade em telas muito pequenas */
-  }
-
-  body, html {
-    background: #f4f4f4; /* Mantém cor de fundo leve em telas pequenas */
-  }
 }
