@@ -3,7 +3,7 @@ const Service = require('node-windows').Service;
 
 // Crie uma instância do serviço
 const svc = new Service({
-  name: 'APIPORTAL',
+  name: 'TESTE',
   description: 'Um serviço que coleta o hostname e a conta logada no PC.',
   script: path.join(__dirname, 'serviceWorker.js'),
 
