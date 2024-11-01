@@ -132,12 +132,6 @@ input[type="checkbox"] {
   margin-right: 10px;
 }
 
-.collapsible-content {
-  padding: 10px;
-  background: #e9ecef; /* Fundo mais suave */
-  border-radius: 4px;
-}
-
 .add-edit-form-modal {
   position: fixed;
   top: 50%;
@@ -234,6 +228,29 @@ input[type="checkbox"] {
   margin-top: 20px;
 }
 
+/* Estilo para os botões */
+.import-csv-modal button {
+  padding: 6px 10px; /* Reduza ainda mais o espaçamento interno do botão */
+  font-size: 12px; /* Reduza o tamanho da fonte do botão */
+  color: #fff; /* Cor do texto do botão */
+  background-color: #474747; /* Cor de fundo do botão */
+  border: none; /* Borda do botão */
+  border-radius: 6px; /* Borda arredondada do botão */
+  cursor: pointer; /* Cursor do botão */
+  transition: background-color 0.3s; /* Transição do botão */
+  margin: 5px; /* Ajuste o espaçamento entre os botões */
+  display: inline-block; /* Faz com que os botões fiquem um ao lado do outro */
+}
+
+/* Adicione um contêiner para os botões para garantir que fiquem lado a lado */
+.import-csv-modal .button-container {
+  display: flex; /* Flexbox para alinhar os botões lado a lado */
+  justify-content: center; /* Centraliza os botões */
+  width: 100%; /* Para que os botões ocupem toda a largura disponível */
+}
+
+/* O resto do código permanece igual */
+
 /* Estilo para o modal de importação CSV */
 .import-csv-modal {
   position: fixed;
@@ -246,8 +263,8 @@ input[type="checkbox"] {
   border-radius: 10px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   z-index: 1000;
-  width: 300px;
-  max-width: 300px;
+  width: 400px; /* Aumente a largura do modal */
+  max-width: 400px; /* Aumente o max-width do modal */
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -263,7 +280,6 @@ input[type="checkbox"] {
   flex-direction: column;
   gap: 15px;
   width: 100%;
-  max-width: 400px;
 }
 
 /* Estilo para os inputs */
@@ -272,24 +288,6 @@ input[type="checkbox"] {
   font-size: 16px; /* Tamanho da fonte do input */
   border: 1px solid #ccc; /* Borda do input */
   border-radius: 6px; /* Borda arredondada do input */
-}
-
-/* Estilo para os botões */
-.import-csv-modal button {
-  padding: 10px 15px; /* Espaçamento interno do botão */
-  font-size: 16px; /* Tamanho da fonte do botão */
-  color: #fff; /* Cor do texto do botão */
-  background-color: #4CAF50; /* Cor de fundo do botão */
-  border: none; /* Borda do botão */
-  border-radius: 6px; /* Borda arredondada do botão */
-  cursor: pointer; /* Cursor do botão */
-  transition: background-color 0.3s; /* Transição do botão */
-  margin: 10px; /* Espaçamento do botão */
-  display: inline-block; /* Faz com que os botões fiquem um do lado do outro */
-}
-
-.import-csv-modal button:hover {
-  background-color: #0056b3;
 }
 
 /* Estilo específico para o botão de cancelar */
@@ -303,13 +301,17 @@ input[type="checkbox"] {
 
 /* Estilo para o botão de baixar exemplo CSV */
 .import-csv-modal button.download-example {
-  background-color: #28a745;
-  display: block; /* Faz com que o botão fique em uma linha separada */
-  margin-top: 20px; /* Adiciona um espaçamento entre o botão e os outros botões */
+  background-color: #707070;
 }
 
 .import-csv-modal button.download-example:hover {
   background-color: #218838;
+}
+
+.button-container {
+  display: flex; /* Flexbox para alinhar os botões lado a lado */
+  justify-content: center; /* Centraliza os botões */
+  width: 100%; /* Para que os botões ocupem toda a largura disponível */
 }
 
 .search-container {
@@ -351,6 +353,7 @@ input[type="checkbox"] {
   text-align: center;
 }
 
+
 .export-popup button {
   padding: 10px 15px; /* Espaçamento interno do botão */
   font-size: 16px; /* Tamanho da fonte do botão */
@@ -371,8 +374,13 @@ input[type="checkbox"] {
   border-radius: 6px; /* Borda arredondada do input */
 }
 
+.export-popup label{
+  color: #5d5d5d;
+}
+
 .export-popup h2 {
-  color: #fff; /* Cor do texto do h2 */
+  color: #ececec; /* Cor do texto do h2 */
+  font-size: 19px;
 }
 
 .pdf-modal {

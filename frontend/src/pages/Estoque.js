@@ -44,7 +44,10 @@ import React, { useState, useEffect } from 'react';
       criadoPor: '',  
       alteradoPor:'',
       dataCriacao: '',
-      dataModificacao: ''
+      dataModificacao: '',
+      dataNextDesmobilizado:'',
+      Observacao:'',
+      ChamadoSolicitacao:''
     });
     const [csvFile, setCsvFile] = useState(null);
     const [isCollapsibleOpen, setIsCollapsibleOpen] = useState(false);
@@ -55,9 +58,24 @@ import React, { useState, useEffect } from 'react';
     const [startDate, setStartDate] = useState('');
     const [endDate, setEndDate] = useState('');
     const [username, setUsername] = useState('');
-    const [pdfUrl, setPdfUrl] = useState(''); // URL do PDF
-    const [isPdfModalOpen, setIsPdfModalOpen] = useState(false); // Estado do modal do PDF  
+    const [pdfUrl, setPdfUrl] = useState(''); 
+    const [isPdfModalOpen, setIsPdfModalOpen] = useState(false);
+    const [plants, setPlants] = useState([]);
+    const [selectedPlanta, setSelectedPlanta] = useState('');
     
+    useEffect(() => {
+      const fetchPlants = async () => {
+        try {
+          const response = await axios.get('http://mao-s038:3003/dashboard/plantas');
+          setPlants(response.data);
+        } catch (error) {
+          console.error('Erro ao buscar plantas:', error);
+        }
+      };
+  
+      fetchPlants();
+    }, []);
+
     useEffect(() => {
       const loggedUser = localStorage.getItem('loggedUser ');
       if (loggedUser ) {
@@ -73,7 +91,7 @@ import React, { useState, useEffect } from 'react';
     const handleExport = async () => {
       setIsExporting(true);
       try {
-        const response = await axios.get('http://localhost:3003/inventario');
+        const response = await axios.get('http://mao-s038:3003/inventario');
         const data = response.data;
         const filteredData = data.filter(item => {
           const createdAt = moment(item.dataCriacao);
@@ -108,7 +126,10 @@ import React, { useState, useEffect } from 'react';
             CriadoPor: item.criadoPor,
             AlteradoPor:item.alteradoPor,
             DataCriacao: moment(item.dataCriacao).format('DD/MM/YYYY'),
-            DataModificacao: moment(item.dataModificacao).format('DD/MM/YYYY')
+            DataModificacao: moment(item.dataModificacao).format('DD/MM/YYYY'),
+            dataNextDesmobilizado:moment(item.dataNextDesmobilizado).formart('DD/MM/YYYY'),
+            Observacao:item.Observacao,
+            ChamadoSolicitacao:item.ChamadoSolicitacao
           };
         });
         const csv = Papa.unparse(csvData);
@@ -152,53 +173,97 @@ import React, { useState, useEffect } from 'react';
 
 
     const handleDownload = async () => {
-      if (downloadOption === 'completo') {
-        downloadFilledCSV();
-      } else if (downloadOption === 'periodo') {
-        downloadByPeriod();
+      if (!selectedPlanta) {
+        alert('Por favor, selecione uma planta antes de baixar.');
+        return;
+      }
+    
+      try {
+        if (downloadOption === 'completo') {
+          await downloadFilledCSV(selectedPlanta); // Passa a planta selecionada
+        } else if (downloadOption === 'periodo') {
+          if (!startDate || !endDate) {
+            alert('Por favor, preencha as datas inicial e final.');
+            return;
+          }
+    
+          // Verifica se as datas estão corretas
+          if (moment(startDate).isAfter(moment(endDate))) {
+            alert('A data inicial não pode ser posterior à data final.');
+            return;
+          }
+    
+          await downloadByPeriod(selectedPlanta, startDate, endDate); // Passa a planta e as datas
+        }
+      } catch (error) {
+        console.error('Erro ao realizar o download:', error);
+        alert('Ocorreu um erro ao tentar realizar o download. Por favor, tente novamente.');
+      } finally {
+        setIsExporting(false);
       }
     };
     
-    const downloadByPeriod = async () => {
+    const downloadByPeriod = async (planta, startDate, endDate) => {
       try {
-        const response = await axios.get('http://localhost:3003/inventario');
+        const response = await axios.get('http://mao-s038:3003/inventario/exportar', {
+          params: {
+            planta: planta,
+            startDate: startDate,
+            endDate: endDate
+          }
+        });
+    
         const data = response.data;
+        console.log('Dados retornados da API:', data);
+    
+        // Filtra os dados baseado nas datas de criação e na planta
         const filteredData = data.filter(item => {
-          const createdAt = moment(item.dataCriacao);
-          return createdAt.isBetween(startDate, endDate, 'day', '[]');
+          const createdAt = moment(item.dataCriacao); // A data de criação do item
+          const isInDateRange = createdAt.isBetween(moment(startDate), moment(endDate), 'day', '[]');
+          const isInSelectedPlanta = item.planta === planta; // Verifica se a planta do item é a selecionada
+    
+          return isInDateRange && isInSelectedPlanta; // Retorna true se estiver dentro do intervalo e na planta selecionada
         });
-        const csvData = filteredData.map(item => {
-          return {
-            Patrimonio: item.Patrimonio,
-            Empresa: item.empresa,
-            Setor: item.setor,
-            CentroDeCusto: item.centroDeCusto,
-            Tipo: item.tipo,
-            Marca: item.marca,
-            Modelo: item.modelo,
-            Office: item.office,
-            Compartilhada: item.compartilhada,
-            Usuarios: item.usuarios,
-            Planta: item.planta,
-            TipoCompra: item.tipoCompra,
-            Fornecedor: item.fornecedor,
-            NF: item.nf,
-            DataNF: moment(item.dataNf).format('DD/MM/YYYY'),
-            ValorUnitario: item.valorUnitario,
-            DataRecebimento: moment(item.dataRecebimento).format('DD/MM/YYYY'),
-            ChamadoFiscal: item.chamadoFiscal,
-            DataEntradaFiscal: moment(item.dataEntradaFiscal).format('DD/MM/YYYY'),
-            ChamadoNext: item.chamadoNext,
-            DataNext: moment(item.dataNext).format('DD/MM/YYYY'),
-            EntradaContabil: item.entradaContabil,
-            Garantia: item.garantia,
-            Comodato: item.comodato,
-            CriadoPor: item.criadoPor,
-            AlteradoPor:item.alteradoPor,
-            DataCriacao: moment(item.dataCriacao).format('DD/MM/YYYY'),
-            DataModificacao: moment(item.dataModificacao).format('DD/MM/YYYY')
-          };
-        });
+    
+        if (filteredData.length === 0) {
+          alert('Nenhum dado encontrado para o período e planta selecionados.');
+          return;
+        }
+    
+        const csvData = filteredData.map(item => ({
+          Patrimonio: item.Patrimonio,
+          Empresa: item.empresa,
+          Setor: item.setor,
+          CentroDeCusto: item.centroDeCusto,
+          Tipo: item.tipo,
+          Marca: item.marca,
+          Modelo: item.modelo,
+          Office: item.office,
+          Compartilhada: item.compartilhada ? 'Sim' : 'Não',
+          Usuarios: item.usuarios,
+          Planta: item.planta,
+          TipoCompra: item.tipoCompra,
+          Fornecedor: item.fornecedor,
+          NF: item.nf,
+          DataNF: moment(item.dataNf).format('YYYY/MM/DD'), 
+          ValorUnitario: item.valorUnitario,
+          DataRecebimento: moment(item.dataRecebimento).format('YYYY/MM/DD'), 
+          ChamadoFiscal: item.chamadoFiscal,
+          DataEntradaFiscal: moment(item.dataEntradaFiscal).format('YYYY/MM/DD'), 
+          ChamadoNext: item.chamadoNext,
+          DataNext: moment(item.dataNext).format('YYYY/MM/DD'), 
+          EntradaContabil: item.entradaContabil,
+          Garantia: item.garantia,
+          Comodato: item.comodato,
+          CriadoPor: item.criadoPor,
+          AlteradoPor: item.alteradoPor,
+          DataCriacao: moment(item.dataCriacao).format('YYYY/MM/DD'), 
+          DataModificacao: moment(item.dataModificacao).format('YYYY/MM/DD'),
+          dataNextDesmobilizado:moment(item.dataNextDesmobilizado).format('DD/MM/YYYY'),
+          Observacao:item.Observacao,
+          ChamadoSolicitacao:item.ChamadoSolicitacao
+        }));
+    
         const csv = Papa.unparse(csvData);
         const blob = new Blob([csv], { type: 'text/csv' });
         const url = URL.createObjectURL(blob);
@@ -208,12 +273,13 @@ import React, { useState, useEffect } from 'react';
         a.click();
         URL.revokeObjectURL(url);
       } catch (error) {
-        console.error(error);
+        console.error('Erro ao baixar os dados por período:', error);
+        alert('Ocorreu um erro ao tentar baixar os dados por período. Por favor, tente novamente.');
       } finally {
         setIsExporting(false);
       }
     };
-
+    
     const sortedData = React.useMemo(() => {
       let sortableItems = [...filteredEstoque];
       sortableItems.sort((a, b) => {
@@ -235,7 +301,7 @@ import React, { useState, useEffect } from 'react';
 
   const getEstoque = async () => {
       try {
-        const response = await axios.get('http://localhost:3003/inventario');
+        const response = await axios.get('http://mao-s038:3003/inventario');
         setEstoque(response.data);
       } catch (error) {
         console.error('Erro ao obter os dados:', error);
@@ -248,10 +314,14 @@ import React, { useState, useEffect } from 'react';
 
     const handleChange = (e) => {
       const { name, value, type, checked } = e.target;
+      
       if (name !== 'criadoPor') {
+        // Verifica se o campo é 'compartilhada' ou 'comodato'
         if (name === 'compartilhada' || name === 'comodato') {
-          setNewEstoque(prev => ({ ...prev, [name]: checked ? 'Sim' : 'Não' }));
+          // Atualiza o estado baseado no valor selecionado
+          setNewEstoque(prev => ({ ...prev, [name]: value }));
         } else {
+          // Para outros campos, verifica se é um checkbox
           setNewEstoque(prev => ({ ...prev, [name]: type === 'checkbox' ? checked : value }));
         }
       }
@@ -261,7 +331,7 @@ import React, { useState, useEffect } from 'react';
       e.preventDefault();
       try {
         // Verificar se o patrimônio já existe no servidor
-        const existeResponse = await axios.get(`http://localhost:3003/inventario/existe/${newEstoque.Patrimonio}`);
+        const existeResponse = await axios.get(`http://mao-s038:3003/inventario/existe/${newEstoque.Patrimonio}`);
         if (existeResponse.data.existe && editingIndex === null) {
           alert('Erro: Patrimônio já existe.');
           return;
@@ -270,7 +340,7 @@ import React, { useState, useEffect } from 'react';
         const compartilhada = newEstoque.compartilhada === 'Sim' ? 'Sim' : 'Não';
         const comodato = newEstoque.comodato === 'Sim' ? 'Sim' : 'Não';
         const method = editingIndex !== null ? 'put' : 'post';
-        const url = editingIndex !== null ? `http://localhost:3003/inventario/${newEstoque.Patrimonio}` : 'http://localhost:3003/inventario';
+        const url = editingIndex !== null ? `http://mao-s038:3003/inventario/${newEstoque.Patrimonio}` : 'http://mao-s038:3003/inventario';
     
         const data = {
           ...newEstoque,
@@ -285,6 +355,7 @@ import React, { useState, useEffect } from 'react';
         if (data.dataRecebimento) data.dataRecebimento = moment(data.dataRecebimento).format('YYYY-MM-DD');
         if (data.dataEntradaFiscal) data.dataEntradaFiscal = moment(data.dataEntradaFiscal).format('YYYY-MM-DD');
         if (data.dataNext) data.dataNext = moment(data.dataNext).format('YYYY-MM-DD');
+        if (data.dataNextDesmobilizado) data.dataNextDesmobilizado = moment(data.dataNextDesmobilizado).format('YYYY-MM-DD');
     
         if (data.valorUnitario === '') {
           data.valorUnitario = null;
@@ -296,7 +367,6 @@ import React, { useState, useEffect } from 'react';
         setIsAdding(false);
         getEstoque();
       } catch (error) {
-        console.error('Erro ao enviar os dados:', error);
         const errorMessage = error.response?.data?.error || 'Erro ao enviar os dados.';
         alert(errorMessage);
       }
@@ -326,62 +396,63 @@ import React, { useState, useEffect } from 'react';
         skipEmptyLines: true,
         complete: async (results) => {
           const csvData = results.data;
+      
+          const formattedData = [];
     
-          console.log('Dados recebidos:', csvData);
-    
-          const formattedData = csvData.map(item => {
+          for (const item of csvData) {
             const setor = centroDeCusto[item['Centro de Custo']] || '';
-    
+            
             // Convert dates to ISO format
             const dataNfIso = item['Data NF'] ? moment(item['Data NF'], 'DD/MM/YYYY', true).toISOString() : '';
             const dataRecebimentoIso = item['Data Recebimento'] ? moment(item['Data Recebimento'], 'DD/MM/YYYY', true).toISOString() : '';
             const dataEntradaFiscalIso = item['Data Entrada Fiscal'] ? moment(item['Data Entrada Fiscal'], 'DD/MM/YYYY', true).toISOString() : '';
             const dataNextIso = item['Data Next'] ? moment(item['Data Next'], 'DD/MM/YYYY', true).toISOString() : '';
-    
-            return {
-              patrimonio: item.Patrimônio || '',
-              empresa: item.Empresa || '',
-              setor: setor,
-              centroDeCusto: item['Centro de Custo'] || '',
-              tipo: item.Tipo || '',
-              marca: item.Marca || '',
-              modelo: item.Modelo || '',
-              office: item.Office || '',
-              compartilhada: item.Compartilhada === 'Sim' ? 'Sim' : 'Não',
-              usuarios: item.Usuários || '',
-              planta: item.Planta || '',
-              tipoCompra: item['Tipo Compra'] || '',
-              fornecedor: item.Fornecedor || '',
-              nf: item.NF || '',
-              dataNf: dataNfIso,
-              valorUnitario: item['Valor Unitário'] || '',
-              dataRecebimento: dataRecebimentoIso,
-              chamadoFiscal: item['Chamado Fiscal'] || '',
-              dataEntradaFiscal: dataEntradaFiscalIso,
-              chamadoNext: item['Chamado Next'] || '',
-              dataNext: dataNextIso,
-              entradaContabil: item['Entrada Contábil'] || '',
-              garantia: item.Garantia || '',
-              comodato: item.Comodato === 'Sim' ? 'Sim' : 'Não',
-              criadoPor:'',
-              alteradoPor: getCookie('username') || '',
-              dataModificacao: ''
-            };
-          });
-    
-          // Verifique os dados
-          if (!formattedData.every(item => item.Patrimonio && item.empresa && item.setor && item.centroDeCusto)) {
-            alert('Erro: Dados inválidos. Por favor, verifique os dados e tente novamente.');
-            return;
+            const dataNextDesmobilizadoIso = item['Data Next Desmobilizado'] ? moment(item['Data Next Desmobilizado'], 'DD/MM/YYYY', true).toISOString() : '';
+              
+            if (item.Patrimônio && item.Empresa && setor && item['Centro de Custo']) {
+              formattedData.push({
+                patrimonio: item.Patrimônio || '',
+                empresa: item.Empresa || '',
+                setor: setor,
+                centroDeCusto: item['Centro de Custo'] || '',
+                tipo: item.Tipo || '',
+                marca: item.Marca || '',
+                modelo: item.Modelo || '',
+                office: item.Office || '',
+                compartilhada: item.Compartilhada === 'Sim' ? 'Sim' : 'Não',
+                usuarios: item.Usuários || '',
+                planta: item.Planta || '',
+                tipoCompra: item['Tipo Compra'] || '',
+                fornecedor: item.Fornecedor || '',
+                nf: item.NF || '',
+                dataNf: dataNfIso,
+                valorUnitario: item['Valor Unitário'] || '',
+                dataRecebimento: dataRecebimentoIso,
+                chamadoFiscal: item['Chamado Fiscal'] || '',
+                dataEntradaFiscal: dataEntradaFiscalIso,
+                chamadoNext: item['Chamado Next'] || '',
+                dataNext: dataNextIso,
+                entradaContabil: item['Entrada Contábil'] || '',
+                garantia: item.Garantia || '',
+                comodato: item.Comodato === 'Sim' ? 'Sim' : 'Não',
+                criadoPor: '',
+                alteradoPor: getCookie('username') || '',
+                dataModificacao: '',
+                dataNextDesmobilizado:dataNextDesmobilizadoIso,
+                observacao:item.Observacao ||'',
+                ChamadoSolicitacao:item.ChamadoSolicitacao ||'',
+              });
+            } else {
+              alert('Erro: Dados inválidos. Por favor, verifique os dados e tente novamente.');
+              return;
+            }
           }
     
           try {
-            const response = await axios.post('http://localhost:30030/inventario/importar', formattedData);
-            console.log('Dados importados com sucesso:', response.data);
+            const response = await axios.post('http://mao-s038:3003/inventario/importar', formattedData);
             alert('Dados importados com sucesso!');
             getEstoque();
           } catch (error) {
-            console.error('Erro ao importar os dados:', error);
             if (error.response) {
               alert(`Erro ${error.response.status}: ${error.response.data.message}`);
             } else {
@@ -391,16 +462,17 @@ import React, { useState, useEffect } from 'react';
         },
         error: (error) => {
           alert('Erro ao importar o arquivo CSV.');
-          console.error(error);
         }
       });
     };
+    
     const downloadExampleCSV = () => {
       const csvHeader = [
         'Patrimônio', 'Empresa', 'Setor', 'Centro de Custo', 'Tipo', 'Marca', 'Modelo',
         'Office', 'Compartilhada', 'Usuários', 'Planta', 'Tipo Compra', 'Fornecedor',
         'NF', 'Data NF', 'Valor Unitário', 'Data Recebimento', 'Chamado Fiscal',
-        'Data Entrada Fiscal', 'Chamado Next', 'Data Next', 'Entrada Contábil', 'Garantia','Comodato'
+        'Data Entrada Fiscal', 'Chamado Next', 'Data Next', 'Entrada Contábil', 'Garantia','Comodato',
+        'Data Next Desmobilizado','Observação','ChamadoSolicitacao'
       ].map(header => `"${header}"`).join(',') + '\n';
 
       const csvContent = csvHeader;
@@ -416,9 +488,8 @@ import React, { useState, useEffect } from 'react';
 
     const checkPDFExists = async (patrimonio) => {
       try {
-          const response = await fetch(`http://localhost:3003/check-pdfs/${patrimonio}`);
+          const response = await fetch(`http://mao-s038:3003/check-pdfs/${patrimonio}`);
           const text = await response.text(); // Lê a resposta como texto
-          console.log('Resposta do servidor:', text); // Verifique o que está sendo retornado
           const data = JSON.parse(text); // Tente analisar como JSON
           return data.exists; 
       } catch (error) {
@@ -439,7 +510,7 @@ import React, { useState, useEffect } from 'react';
     }
 
     try {
-        const response = await fetch(`http://localhost:3003/comodato/pdf/${patrimonio}`);
+        const response = await fetch(`http://mao-s038:3003/comodato/pdf/${patrimonio}`);
         if (response.ok) {
             const blob = await response.blob();
             const url = window.URL.createObjectURL(blob);
@@ -458,40 +529,53 @@ import React, { useState, useEffect } from 'react';
     setIsPdfModalOpen(false);
     setPdfUrl(''); // Limpa a URL do PDF
 };
-    const downloadFilledCSV = () => {
-      if (estoque.length === 0) {
-        alert('Não há dados preenchidos para exportar.');
-        return;
-      }
+  const downloadFilledCSV = () => {
+    if (estoque.length === 0) {
+      alert('Não há dados preenchidos para exportar.');
+      return;
+    }
 
-      const csvHeader = [
-        'Patrimônio', 'Empresa', 'Setor', 'Centro de Custo', 'Tipo', 'Marca', 'Modelo',
-        'Office', 'Compartilhada', 'Usuários', 'Planta', 'Tipo Compra', 'Fornecedor',
-        'NF', 'Data NF', 'Valor Unitário', 'Data Recebimento', 'Chamado Fiscal',
-        'Data Entrada Fiscal', 'Chamado Next', 'Data Next', 'Entrada Contábil', 'Garantia','Comodato', 'Data Criação', 'Data Modificação'
-      ].map(header => `"${header}"`).join(',') + '\n';
+    // Filtra o estoque pela planta selecionada
+    const filteredEstoque = estoque.filter(item => item.planta === selectedPlanta);
+    
+    if (filteredEstoque.length === 0) {
+      alert('Não há dados preenchidos para a planta selecionada.');
+      return;
+    }
 
-      const csvRows = estoque.map(item =>
-        [
-          item.Patrimonio, item.empresa, item.setor, item.centroDeCusto, item.tipo,
-          item.marca, item.modelo, item.office, item.compartilhada ? 'Sim' : 'Não',
-          item.usuarios, item.planta, item.tipoCompra, item.fornecedor, item.nf,
-          item.dataNf, item.valorUnitario, item.dataRecebimento, item.chamadoFiscal,
-          item.dataEntradaFiscal, item.chamadoNext, item.dataNext, item.entradaContabil, item.garantia,item.comodato ? 'Sim' : 'Não',
-          moment(item.dataCriacao).format('YYYY-MM-DD'), moment(item.dataModificacao).format('YYYY-MM-DD')
-        ].map(value => `"${(value || '').replace(/"/g, '""') }"`).join(',')
-      ).join('\n');
+    const csvHeader = [
+      'Patrimônio', 'Empresa', 'Setor', 'Centro de Custo', 'Tipo', 'Marca', 'Modelo',
+      'Office', 'Compartilhada', 'Usuários', 'Planta', 'Tipo Compra', 'Fornecedor',
+      'NF', 'Data NF', 'Valor Unitário', 'Data Recebimento', 'Chamado Fiscal',
+      'Data Entrada Fiscal', 'Chamado Next', 'Data Next', 'Entrada Contábil', 'Garantia', 'Comodato', 'Data Criação', 'Data Modificação',
+      'Data Next Desmobilizado','Observação','ChamadoSolicitacao'
+    ].map(header => `"${header}"`).join(',') + '\n';
 
-      const csvContent = csvHeader + csvRows;
+    const csvRows = filteredEstoque.map(item =>
+      [
+        item.Patrimonio, item.empresa, item.setor, item.centroDeCusto, item.tipo,
+        item.marca, item.modelo, item.office, item.compartilhada ? 'Sim' : 'Não',
+        item.usuarios, item.planta, item.tipoCompra, item.fornecedor, item.nf,
+        moment(item.dataNf).format('YYYY-MM-DD'), item.valorUnitario,
+        moment(item.dataRecebimento).format('YYYY-MM-DD'), item.chamadoFiscal,
+        moment(item.dataEntradaFiscal).format('YYYY-MM-DD'), item.chamadoNext,
+        moment(item.dataNext).format('YYYY-MM-DD'), item.entradaContabil,
+        item.garantia, item.comodato ? 'Sim' : 'Não',
+        moment(item.dataCriacao).format('YYYY-MM-DD'), moment(item.dataModificacao).format('YYYY-MM-DD'),
+        moment(item.dataNextDesmobilizado).format('YYYY-MM-DD'),item.Observacao
+      ].map(value => `"${(value !== undefined && value !== null ? value : '').toString().replace(/"/g, '""')}"`).join(',')
+    ).join('\n');
 
-      const encodedUri = encodeURI(`data:text/csv;charset=utf-8,\uFEFF${csvContent}`);
-      const link = document.createElement("a");
-      link.setAttribute("href", encodedUri);
-      link.setAttribute("download", "inventário.csv");
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-    };
+    const csvContent = csvHeader + csvRows;
+
+    const encodedUri = encodeURI(`data:text/csv;charset=utf-8,\uFEFF${csvContent}`);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", "inventário.csv");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
 
     const resetNewEstoque = () => {
   setNewEstoque({
@@ -522,7 +606,10 @@ import React, { useState, useEffect } from 'react';
         criadoPor: username,
         alteradoPor:'',
         dataCriacao: '',
-        dataModificacao: ''
+        dataModificacao: '',
+        dataNextDesmobilizado:'',
+        observacao:'',
+        ChamadoSolicitacao:''
       });
       setIsAdding(false);
     };
@@ -594,7 +681,7 @@ import React, { useState, useEffect } from 'react';
                     <td>{item.marca}</td>
                     <td>{item.modelo}</td>
                     <td>{item.office}</td>
-                    <td>{item.compartilhada ? 'Sim' : 'Não'}</td>
+                    <td>{item.compartilhada === 'Sim' ? 'Sim' : 'Não'}</td>
                     <td>{item.usuarios}</td>
                     <td>{item.planta}</td>
                     <td>{formatDate(item.dataCriacao)}</td>
@@ -611,7 +698,7 @@ import React, { useState, useEffect } from 'react';
                   {isCollapsibleOpen === index && (
                     <tr>
                         <td colSpan="14">
-                            <div className="collapsible-content" style={{ backgroundColor: '#515151', color: '#fff', padding: '10px', borderRadius: '5px' }}>
+                            <div className="collapsible-content" style={{ backgroundColor: '#515151', color: '#fff', padding: '5px', borderRadius: '5px' }}>
                                 <p><strong>Detalhes Adicionais:</strong></p>
                                 <table>
                                     <tbody>
@@ -652,8 +739,16 @@ import React, { useState, useEffect } from 'react';
                                             <td>{item.chamadoNext}</td>
                                         </tr>
                                         <tr>
+                                            <td><strong>Chamado:</strong></td>
+                                            <td>{item.ChamadoSolicitacao}</td>
+                                        </tr>
+                                        <tr>
                                             <td><strong>Data Next:</strong></td>
                                             <td>{formatDate(item.dataNext)}</td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Data Next Desmobilização:</strong></td>
+                                            <td>{formatDate(item.dataNextDesmobilizado)}</td>
                                         </tr>
                                         <tr>
                                             <td><strong>Entrada Contábil:</strong></td>
@@ -681,7 +776,6 @@ import React, { useState, useEffect } from 'react';
                                             </button>
                                         </td>
                                     </tr>
-
                                         <tr>
                                             <td><strong>Criado Por:</strong></td>
                                             <td>{item.criadoPor[0]}</td>
@@ -689,6 +783,10 @@ import React, { useState, useEffect } from 'react';
                                         <tr>
                                             <td><strong>Alterado Por:</strong></td>
                                             <td>{item.alteradoPor}</td>
+                                        </tr>
+                                        <tr>
+                                          <td><strong>Observação:</strong></td>
+                                          <td>{item.Observacao}</td>
                                         </tr>
                                     </tbody>
                                 </table>
@@ -724,7 +822,7 @@ import React, { useState, useEffect } from 'react';
           <div className="add-edit-form-modal">
             <form onSubmit={handleSubmit}>
               <label>
-                Patrimônio:
+                Patrimônio*:
                 <input
                   type="text"
                   name="patrimonio"
@@ -735,7 +833,7 @@ import React, { useState, useEffect } from 'react';
                 />
               </label>
               <label>
-                Empresa:
+                Empresa*:
                 <input
                   type="text"
                   name="empresa"
@@ -753,7 +851,7 @@ import React, { useState, useEffect } from 'react';
                 />
               </label>
               <label>
-                Centro de Custo:
+                Centro de Custo*:
                 <input
                   type="text"
                   name="centroDeCusto"
@@ -762,7 +860,7 @@ import React, { useState, useEffect } from 'react';
                 />
               </label>
               <label>
-                Tipo:
+                Tipo*:
                 <input
                   type="text"
                   name="tipo"
@@ -771,7 +869,7 @@ import React, { useState, useEffect } from 'react';
                 />
               </label>
               <label>
-                Marca:
+                Marca*:
                 <input
                   type="text"
                   name="marca"
@@ -780,7 +878,7 @@ import React, { useState, useEffect } from 'react';
                 />
               </label>
               <label>
-                Modelo:
+                Modelo*:
                 <input
                   type="text"
                   name="modelo"
@@ -789,7 +887,7 @@ import React, { useState, useEffect } from 'react';
                 />
               </label>
               <label>
-                Office:
+                Office*:
                 <input
                   type="text"
                   name="office"
@@ -798,7 +896,7 @@ import React, { useState, useEffect } from 'react';
                 />
               </label>
               <label>
-                Compartilhada:
+                Compartilhada*:
                 <select
                   name="compartilhada"
                   value={newEstoque.compartilhada}
@@ -809,7 +907,7 @@ import React, { useState, useEffect } from 'react';
                 </select>
               </label>
               <label>
-                Usuários:
+                Usuários*:
                 <input
                   type="text"
                   name="usuarios"
@@ -819,12 +917,30 @@ import React, { useState, useEffect } from 'react';
               </label>
               <label>
                 Planta:
-                <input
-                  type="text"
+                <select
                   name="planta"
                   value={newEstoque.planta}
-                  onChange={handleChange}
-                />
+                  onChange={(e) => setNewEstoque({ ...newEstoque, planta: e.target.value })}
+                >
+                  <option value="">Selecione uma planta</option> {/* Default option */}
+                  <option value="Linhares">Linhares</option>
+                  <option value="Curitiba Matriz">Curitiba Matriz</option>
+                  <option value="Curitiba Marechal">Curitiba Marechal</option> {/* Fixed closing tag */}
+                  <option value="Joinville Fabrica A1">Joinville Fabrica A1</option>
+                  <option value="Joinville Fabrica A2">Joinville Fabrica A2</option>
+                  <option value="Joinville Fabrica A3">Joinville Fabrica A3</option>
+                  <option value="Joinville CD B1">Joinville CD B1</option>
+                  <option value="Joinville CD B2">Joinville CD B2</option>
+                  <option value="Joinville AG C1">Joinville AG C1</option>
+                  <option value="MANAUS A1">MANAUS A1</option>
+                  <option value="MANAUS A2">MANAUS A2</option>
+                  <option value="MANAUS A3">MANAUS A3</option>
+                  <option value="MANAUS B1">MANAUS B1</option>
+                  <option value="MANAUS B2">MANAUS B2</option>
+                  <option value="MANAUS B3">MANAUS B3</option>
+                  <option value="MANAUS IMC">MANAUS IMC</option>
+                  <option value="MANAUS IAC">MANAUS IAC</option>
+                </select>
               </label>
               <label>
                 Tipo Compra:
@@ -900,6 +1016,15 @@ import React, { useState, useEffect } from 'react';
                 />
               </label>
               <label>
+                Chamado:
+                <input
+                  type="text"
+                  name="ChamadoSolicitacao"
+                  value={newEstoque.ChamadoSolicitacao}
+                  onChange={handleChange}
+                />
+              </label>
+              <label>
                 Chamado Next:
                 <input
                   type="text"
@@ -914,6 +1039,15 @@ import React, { useState, useEffect } from 'react';
                   type="date"
                   name="dataNext"
                   value={moment(newEstoque.dataNext).format('YYYY-MM-DD')}
+                  onChange={handleChange}
+                />
+              </label>
+              <label>
+                Data Next Desmobilizado:
+                <input
+                  type="date"
+                  name="dataNextDesmobilizado"
+                  value={moment(newEstoque.dataNextDesmobilizado).format('YYYY-MM-DD')}
                   onChange={handleChange}
                 />
               </label>
@@ -935,6 +1069,16 @@ import React, { useState, useEffect } from 'react';
                   onChange={handleChange}
                 />
               </label>
+              <label className='Observacao'>
+                Observação:
+                <textarea
+                  name="Observação"
+                  value={newEstoque.Observacao}
+                  onChange={handleChange}
+                  rows="2" // Ajuste conforme necessário
+                  cols="500" // Ajuste conforme necessário
+                />
+              </label>
               <div className="button-container">
                 <button type="submit" className="submit">
                   {editingIndex !== null ? 'Atualizar' : 'Adicionar'}
@@ -946,47 +1090,50 @@ import React, { useState, useEffect } from 'react';
             </form>
           </div>
         )}
+          {isExporting && (
+            <div className="export-popup">
+              <h2>Exportar CSV</h2>
+              <label>
+                Selecionar Opção de Download:
+                <select onChange={(e) => setDownloadOption(e.target.value)} value={downloadOption}>
+                  <option value="completo">Completo</option>
+                  <option value="periodo">Por Período</option>
+                </select>
+              </label>
+              <label>
+                Selecionar Planta:
+                <select onChange={(e) => setSelectedPlanta(e.target.value)} value={selectedPlanta}>
+                  <option value="">Selecione uma planta</option>
+                  {plants.map((planta, index) => (
+                    <option key={index} value={planta.planta}>{planta.planta}</option>
+                  ))}
+                </select>
+              </label>
+              {downloadOption === 'periodo' && (
+                <div>
+                  <label>
+                    Data Inicial:
+                    <input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} />
+                  </label>
 
-        {isExporting && (
-          <div className="export-popup">
-            <h2>Exportar CSV</h2>
-            <label>
-              <select onChange={(e) => setDownloadOption(e.target.value)} value={downloadOption}>
-                <option value="completo">CSV Completo</option>
-                <option value="periodo">CSV por Período</option>
-              </select>
-            </label>
-            {downloadOption === 'periodo' && (
-              <div>
-                <label>
-                  Data Inicial:
-                  <input
-                    type="date"
-                    value={startDate}
-                    onChange={(e) => setStartDate(e.target.value)}
-                  />
-                </label>
-                <label>
-                  Data Final:
-                  <input
-                    type="date"
-                    value={endDate}
-                    onChange={(e) => setEndDate(e.target.value)}
-                  />
-                </label>
+                  <label>
+                    Data Final:
+                    <input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} />
+                  </label>
+                </div>
+              )}
+              <div className="button-container">
+                <button onClick={handleDownload} disabled={!selectedPlanta || (downloadOption === 'periodo' && (!startDate || !endDate))}>
+                  Baixar
+                </button>
+                <button onClick={() => setIsExporting(false)}>Cancelar</button>
               </div>
-            )}
-            <div className="button-container">
-              <button onClick={handleDownload}>Baixar</button>
-              <button onClick={() => setIsExporting(false)}>Cancelar</button>
             </div>
-          </div>
-        )}
-
+          )}
         {isImporting && (
           <div className="import-csv-modal">
             <form onSubmit={handleImport}>
-              <label>
+              <h5>
                 Selecione o arquivo CSV:
                 <input
                   type="file"
@@ -994,10 +1141,10 @@ import React, { useState, useEffect } from 'react';
                   onChange={handleFileChange}
                   required
                 />
-              </label>
-              <button type="submit">Importar</button>
-              <button type="button" onClick={() => setIsImporting(false)}>Cancelar</button>
-              <button type="button" onClick={downloadExampleCSV}>
+              </h5>
+              <button type="submit" className="btn-importar">Importar</button>
+              <button type="button" className="btn-cancelar" onClick={() => setIsImporting(false)}>Cancelar</button>
+              <button type="button" className="btn-exemplo" onClick={downloadExampleCSV}>
                 Baixar Exemplo CSV
               </button>
             </form>

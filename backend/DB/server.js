@@ -187,6 +187,95 @@ app.post('/comodato', async (req, res) => {
   }
 });
 
+app.post('/comodatointer', async (req, res) => {
+  try {
+    const { nome, matricula, planta, centroDeCusto, setor, patrimonio, usuario } = req.body;
+
+    console.log('Dados recebidos:', req.body);
+
+    // Verificação dos campos obrigatórios
+    if (!nome || !matricula || !centroDeCusto) {
+      return res.status(400).json({ message: 'Erro: Nome, Matrícula e Centro de Custo são obrigatórios.' });
+    }
+
+    const existeRequest = new mssql.Request(pool);
+    existeRequest.input('nome', mssql.VarChar, nome);
+    existeRequest.input('matricula', mssql.VarChar, matricula);
+    const existe = await existeRequest.query(`SELECT * FROM comodato WHERE nome = @nome AND matricula = @matricula;`);
+
+    if (existe.recordset.length > 0) {
+      return res.status(400).json({ message: 'Erro: Comodato já existe.' });
+    }
+
+    const request = new mssql.Request(pool);
+    const query = `
+      INSERT INTO comodato (nome, matricula, planta, centroDeCusto, setor, patrimonio, usuario, dataCriacao)
+      VALUES (@nome, @matricula, @planta, @centroDeCusto, @setor, @patrimonio, @usuario, GETDATE());
+    `;
+    
+    request.input('nome', mssql.VarChar, nome);
+    request.input('matricula', mssql.VarChar, matricula);
+    request.input('planta', mssql.VarChar, planta);
+    request.input('centroDeCusto', mssql.VarChar, centroDeCusto);
+    request.input('setor', mssql.VarChar, setor || null);
+    request.input('patrimonio', mssql.VarChar, patrimonio);
+    request.input('usuario', mssql.VarChar, usuario);
+
+    await request.query(query);
+
+    // Criar PDF a partir de HTML
+    const browser = await puppeteer.launch();
+    const page = await browser.newPage();
+    const dataCriacao = new Date().toLocaleString('pt-BR');
+
+    const htmlContent = `
+      <html>
+        <head>
+          <title>Comodato</title>
+          <style>
+            body { font-family: Arial, sans-serif; }
+            h1 { text-align: center; }
+            .content { margin: 20px; }
+            .field { margin-bottom: 10px; }
+          </style>
+        </head>
+        <body>
+          <h1>COMODATO BRITÂNIA ELETRÔNICOS S.A</h1>
+          <div class="content">
+            <h2>CLÁUSULAS</h2>
+            <p>1.1. Comodato do Direito de uso dos equipamentos mencionados no documento</p>
+            <p>2.1. O prazo de duração do presente contrato é semelhante ao do contrato de trabalho ou de prestação do serviço firmado entre as partes, com início na data da assinatura do presente.</p>
+            <p>3.1. Firmado o presente e na posse do equipamento, o COMODATÁRIO assume toda e qualquer responsabilidade pela conservação e guarda do equipamento que lhe é confiado.</p>
+            <p>3.2. As manutenções e reparos necessários ao equipamento serão realizados pelo COMODANTE, desde que o COMODATÁRIO comunique por escrito ao COMODANTE sobre a necessidade de manutenção ou reparo.</p>
+            <div class="field"><strong>Nome:</strong> ${nome}</div>
+            <div class="field"><strong>Matrícula:</strong> ${matricula}</div>
+            <div class="field"><strong>Planta:</strong> ${planta}</div>
+            <div class="field"><strong>Centro de Custo:</strong> ${centroDeCusto}</div>
+            <div class="field"><strong>Setor:</strong> ${setor || 'N/A'}</div>
+            <div class="field"><strong>Patrimônio:</strong> ${patrimonio}</div>
+            <div class="field"><strong>Usuário:</strong> ${usuario}</div>
+            <div class="field"><strong>Data de Criação:</strong> ${dataCriacao}</div>
+          </div>
+        </body>
+      </html>
+    `;
+
+    await page.setContent(htmlContent);
+    const pdf = await page.pdf({ format: 'A4', printBackground: true });
+
+    const filePath = path.join('C:\\PORTAL38', `${patrimonio || 'comodato'}.pdf`);
+    fs.writeFileSync(filePath, pdf);
+    console.log('PDF salvo em:', filePath);
+
+    await browser.close();
+
+    res.json({ message: 'Comodato adicionado com sucesso!' });
+  } catch (err) {
+    console.error('Erro ao adicionar comodato:', err);
+    res.status(500).json({ message: 'Erro ao adicionar comodato' });
+  }
+});
+
 // Endpoint para verificar PDF específico
 app.get('/check-pdfs/:patrimonio', async (req, res) => {
   const { patrimonio } = req.params;
@@ -253,7 +342,7 @@ app.post('/inventario', async (req, res) => {
       office, compartilhada, usuarios, planta, tipoCompra, fornecedor,
       nf, dataNf, valorUnitario, dataRecebimento, chamadoFiscal,
       dataEntradaFiscal, chamadoNext, dataNext, entradaContabil,
-      garantia, comodato, criadoPor
+      garantia, comodato, criadoPor, datanextDesmobilizado, Observacao, ChamadoSolicitacao
     } = req.body;
 
     if (!pool) {
@@ -285,13 +374,13 @@ app.post('/inventario', async (req, res) => {
       'patrimonio', 'empresa', 'setor', 'centroDeCusto', 'tipo', 
       'marca', 'modelo', 'office', 'compartilhada', 'usuarios', 
       'planta', 'tipoCompra', 'fornecedor', 'nf', 'valorUnitario', 
-      'garantia', 'comodato', 'criadoPor'
+      'garantia', 'comodato', 'criadoPor', 'dataNextDesmobilizado', 'Observacao', 'ChamadoSolicitacao'
     ];
     const values = [
       '@patrimonio', '@empresa', '@setor', '@centroDeCusto', '@tipo', 
       '@marca', '@modelo', '@office', '@compartilhada', '@usuarios', 
       '@planta', '@tipoCompra', '@fornecedor', '@nf', '@valorUnitario', 
-      '@garantia', '@comodato', '@criadoPor'
+      '@garantia', '@comodato', '@criadoPor', '@dataNextDesmobilizado', '@Observacao', '@ChamadoSolicitacao'
     ];
 
     // Adiciona campos de data se estiverem presentes
@@ -328,6 +417,11 @@ app.post('/inventario', async (req, res) => {
     if (entradaContabil) {
       fields.push('entradaContabil');
       values.push('@entradaContabil');
+    }
+
+    if (dataNextDesmobilizado) {
+      fields.push('dataNextDesmobilizado');
+      values.push('@dataNextDesmobilizado');
     }
 
     // Constrói a consulta SQL dinamicamente
@@ -384,6 +478,18 @@ app.post('/inventario', async (req, res) => {
       request.input('entradaContabil', mssql.VarChar, entradaContabil);
     }
 
+    if (datanextDesmobilizado) {
+      request.input('dataNextDesmobilizado', mssql.Date, new Date(datanextDesmobilizado));
+    }
+
+    if (Observacao) {
+      request.input ('Observacao', mssql.VarChar, Observacao);
+    }
+
+    if (ChamadoSolicitacao) {
+      request.input('ChamadoSolicitacao', mssql.VarChar, ChamadoSolicitacao);
+    }
+    
     await request.query(query);
 
     res.json({ message: 'Inventário adicionado com sucesso!' });
@@ -401,7 +507,7 @@ app.put('/inventario/:Patrimonio', async (req, res) => {
     office, compartilhada, usuarios, planta, tipoCompra, fornecedor,
     nf, dataNf, valorUnitario, dataRecebimento, chamadoFiscal,
     dataEntradaFiscal, chamadoNext, dataNext, entradaContabil,
-    garantia, comodato, alteradoPor 
+    garantia, comodato, alteradoPor, datanextDesmobilizado, Observacao, ChamadoSolicitacao
   } = req.body;
 
   try {
@@ -437,32 +543,48 @@ app.put('/inventario/:Patrimonio', async (req, res) => {
     request.input('comodato', mssql.VarChar, comodatoBool);
     request.input('alteradoPor', mssql.VarChar, alteradoPor);
 
+    // Adicionando novos campos
+    if (datanextDesmobilizado) {
+      request.input('dataNextDesmobilizado', mssql.Date, new Date(datanextDesmobilizado));
+    }
+
+    if (Observacao) {
+      request.input('Observacao', mssql.VarChar, Observacao);
+    }
+
+    if (ChamadoSolicitacao) {
+      request.input('ChamadoSolicitacao', mssql.VarChar, ChamadoSolicitacao);
+    }
+
     const query = `
       UPDATE controleInventario SET
-        empresa = @empresa, 
-        setor = @setor, 
+        empresa = @empresa,
+        setor = @setor,
         centroDeCusto = @centroDeCusto,
-        tipo = @tipo, 
-        marca = @marca, 
+        tipo = @tipo,
+        marca = @marca,
         modelo = @modelo,
-        office = @office, 
-        compartilhada = @compartilhada, 
+        office = @office,
+        compartilhada = @compartilhada,
         usuarios = @usuarios,
-        planta = @planta, 
-        tipoCompra = @tipoCompra, 
+        planta = @planta,
+        tipoCompra = @tipoCompra,
         fornecedor = @fornecedor,
-        nf = @nf, 
-        dataNf = @dataNf, 
+        nf = @nf,
         valorUnitario = @valorUnitario,
-        dataRecebimento = @dataRecebimento, 
+        garantia = @garantia,
+        comodato = @comodato,
+        alteradoPor = @alteradoPor,
+        dataNf = @dataNf,
+        dataRecebimento = @dataRecebimento,
         chamadoFiscal = @chamadoFiscal,
-        dataEntradaFiscal = @dataEntradaFiscal, 
+ dataEntradaFiscal = @dataEntradaFiscal,
         chamadoNext = @chamadoNext,
-        dataNext = @dataNext, 
+        dataNext = @dataNext,
         entradaContabil = @entradaContabil,
-        garantia = @garantia, 
-        comodato = @comodato, 
-        alteradoPor = @alteradoPor
+        dataNextDesmobilizado = @dataNextDesmobilizado,
+        Observacao = @Observacao,
+        ChamadoSolicitacao = @ChamadoSolicitacao
       WHERE patrimonio = @Patrimonio
     `;
 
@@ -473,7 +595,6 @@ app.put('/inventario/:Patrimonio', async (req, res) => {
     res.status(500).json({ error: 'Erro ao atualizar inventário' });
   }
 });
-
 
 // Rota para verificar se o registro existe
 app.get('/inventario/existe/:patrimonio', async (req, res) => {
@@ -521,7 +642,6 @@ app.post('/inventario/importar', async (req, res) => {
       } = item;
 
       const comodatoBool = comodato === 'Sim' ? 'Sim' : 'Não';
-
       const dataCriacao = new Date().toISOString();
 
       const existeRequest = new mssql.Request(pool);
@@ -530,13 +650,12 @@ app.post('/inventario/importar', async (req, res) => {
       `;
 
       existeRequest.input('patrimonio', mssql.VarChar, patrimonio);
-
       const existe = await existeRequest.query(existeQuery);
 
       if (existe.recordset.length > 0) {
         // Atualizar o registro existente
         const updateRequest = new mssql.Request(pool);
-        const updateQuery = `
+        let updateQuery = `
           UPDATE controleInventario SET
             empresa = @empresa,
             setor = @setor,
@@ -579,9 +698,11 @@ app.post('/inventario/importar', async (req, res) => {
         updateRequest.input('dataCriacao', mssql.DateTime, dataCriacao);
         updateRequest.input('patrimonio', mssql.VarChar, patrimonio);
 
+        // Adicionando campos opcionais
         if (dataNf) {
           const dataNfDate = new Date(dataNf);
           if (!isNaN(dataNfDate.getTime())) {
+            updateQuery = updateQuery.replace(/SET/, `SET dataNf = @dataNf,`);
             updateRequest.input('dataNf', mssql.Date, dataNfDate);
           }
         }
@@ -589,6 +710,7 @@ app.post('/inventario/importar', async (req, res) => {
         if (dataRecebimento) {
           const dataRecebimentoDate = new Date(dataRecebimento);
           if (!isNaN(dataRecebimentoDate.getTime())) {
+            updateQuery = updateQuery.replace(/SET/, `SET dataRecebimento = @dataRecebimento,`);
             updateRequest.input('dataRecebimento', mssql.Date, dataRecebimentoDate);
           }
         }
@@ -596,6 +718,7 @@ app.post('/inventario/importar', async (req, res) => {
         if (dataEntradaFiscal) {
           const dataEntradaFiscalDate = new Date(dataEntradaFiscal);
           if (!isNaN(dataEntradaFiscalDate.getTime())) {
+            updateQuery = updateQuery.replace(/SET/, `SET dataEntradaFiscal = @dataEntradaFiscal,`);
             updateRequest.input('dataEntradaFiscal', mssql.Date, dataEntradaFiscalDate);
           }
         }
@@ -603,19 +726,23 @@ app.post('/inventario/importar', async (req, res) => {
         if (dataNext) {
           const dataNextDate = new Date(dataNext);
           if (!isNaN(dataNextDate.getTime())) {
+            updateQuery = updateQuery.replace(/SET/, `SET dataNext = @dataNext,`);
             updateRequest.input('dataNext', mssql.Date, dataNextDate);
           }
         }
 
         if (chamadoFiscal) {
+          updateQuery = updateQuery.replace(/SET/, `SET chamadoFiscal = @chamadoFiscal,`);
           updateRequest.input('chamadoFiscal', mssql.VarChar, chamadoFiscal);
         }
 
         if (chamadoNext) {
+          updateQuery = updateQuery.replace(/SET/, `SET chamadoNext = @chamadoNext,`);
           updateRequest.input('chamadoNext', mssql.VarChar, chamadoNext);
         }
 
         if (entradaContabil) {
+          updateQuery = updateQuery.replace(/SET/, `SET entradaContabil = @entradaContabil,`);
           updateRequest.input('entradaContabil', mssql.VarChar, entradaContabil);
         }
 
@@ -623,19 +750,15 @@ app.post('/inventario/importar', async (req, res) => {
       } else {
         // Inserir novo registro
         const insertRequest = new mssql.Request(pool);
-        const insertQuery = `
+        let insertQuery = `
           INSERT INTO controleInventario (
             patrimonio, empresa, setor, centroDeCusto, tipo, marca, modelo,
             office, compartilhada, usuarios, planta, tipoCompra, fornecedor,
-            nf, dataNf, valorUnitario, dataRecebimento, chamadoFiscal,
-            dataEntradaFiscal, chamadoNext, dataNext, entradaContabil,
-            garantia, comodato, criadoPor, dataCriacao
+            nf, valorUnitario, garantia, comodato, criadoPor, dataCriacao
           ) VALUES (
             @patrimonio, @empresa, @setor, @centroDeCusto, @tipo, @marca,
             @modelo, @office, @compartilhada, @usuarios, @planta, @tipoCompra,
-            @fornecedor, @nf, @dataNf, @valorUnitario, @dataRecebimento,
-            @chamadoFiscal, @dataEntradaFiscal, @chamadoNext, @dataNext,
-            @entradaContabil, @garantia, @comodato, @criadoPor, @dataCriacao
+            @fornecedor, @nf, @valorUnitario, @garantia, @comodato, @criadoPor, @dataCriacao
           );
         `;
 
@@ -659,9 +782,11 @@ app.post('/inventario/importar', async (req, res) => {
         insertRequest.input('criadoPor', mssql.VarChar, criadoPor);
         insertRequest.input('dataCriacao', mssql.DateTime, dataCriacao);
 
+        // Adicionando campos opcionais
         if (dataNf) {
           const dataNfDate = new Date(dataNf);
           if (!isNaN(dataNfDate.getTime())) {
+            insertQuery = insertQuery.replace(/VALUES/, `VALUES (@dataNf,`);
             insertRequest.input('dataNf', mssql.Date, dataNfDate);
           }
         }
@@ -669,6 +794,7 @@ app.post('/inventario/importar', async (req, res) => {
         if (dataRecebimento) {
           const dataRecebimentoDate = new Date(dataRecebimento);
           if (!isNaN(dataRecebimentoDate.getTime())) {
+            insertQuery = insertQuery.replace(/VALUES/, `VALUES (@dataRecebimento,`);
             insertRequest.input('dataRecebimento', mssql.Date, dataRecebimentoDate);
           }
         }
@@ -676,26 +802,31 @@ app.post('/inventario/importar', async (req, res) => {
         if (dataEntradaFiscal) {
           const dataEntradaFiscalDate = new Date(dataEntradaFiscal);
           if (!isNaN(dataEntradaFiscalDate.getTime())) {
+            insertQuery = insertQuery.replace(/VALUES/, `VALUES (@dataEntradaFiscal,`);
             insertRequest.input('dataEntradaFiscal', mssql.Date, dataEntradaFiscalDate);
           }
         }
 
         if (dataNext) {
-          const dataNextDate = new Date(dataNext);
+          const dataNextDate = new Date (dataNext);
           if (!isNaN(dataNextDate.getTime())) {
+            insertQuery = insertQuery.replace(/VALUES/, `VALUES (@dataNext,`);
             insertRequest.input('dataNext', mssql.Date, dataNextDate);
           }
         }
 
         if (chamadoFiscal) {
+          insertQuery = insertQuery.replace(/VALUES/, `VALUES (@chamadoFiscal,`);
           insertRequest.input('chamadoFiscal', mssql.VarChar, chamadoFiscal);
         }
 
         if (chamadoNext) {
+          insertQuery = insertQuery.replace(/VALUES/, `VALUES (@chamadoNext,`);
           insertRequest.input('chamadoNext', mssql.VarChar, chamadoNext);
         }
 
         if (entradaContabil) {
+          insertQuery = insertQuery.replace(/VALUES/, `VALUES (@entradaContabil,`);
           insertRequest.input('entradaContabil', mssql.VarChar, entradaContabil);
         }
 
@@ -709,7 +840,6 @@ app.post('/inventario/importar', async (req, res) => {
     res.status(500).json({ message: 'Erro ao importar os dados' });
   }
 });
-
 // Rota para obter todos os inventários
 app.get('/inventario', async (req, res) => {
   try {

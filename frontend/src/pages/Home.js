@@ -16,7 +16,7 @@ const Dashboard = () => {
 
   const fetchData = async () => {
     try {
-      const response = await axios.get('http://localhost:3003/dashboard/contagem', {
+      const response = await axios.get('http://mao-s038:3003/dashboard/contagem', {
         params: { planta: selectedPlanta }
       });
       setData(response.data);
@@ -27,7 +27,7 @@ const Dashboard = () => {
 
   const fetchRecentChanges = async () => {
     try {
-      const response = await axios.get('http://localhost:3003/dashboard/recent-changes', {
+      const response = await axios.get('http://mao-s038:3003/dashboard/recent-changes', {
         params: { planta: selectedPlanta }
       });
       setChanges(response.data);
@@ -38,7 +38,7 @@ const Dashboard = () => {
 
   const fetchPlantas = async () => {
     try {
-      const response = await axios.get('http://localhost:3003/dashboard/plantas');
+      const response = await axios.get('http://mao-s038:3003/dashboard/plantas');
       setPlantas(response.data);
     } catch (error) {
       console.error('Error fetching plantas:', error);

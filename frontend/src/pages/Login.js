@@ -21,7 +21,7 @@ const Login = () => {
   // Função para validar se o username existe
   const validateUsername = async (username) => {
     try {
-      const response = await axios.post('http://localhost:5000/validateUser', { // Removido espaço
+      const response = await axios.post('http://mao-s038:5000/validateUser', { // Removido espaço
         username,
       });
       return response.data.valid; // Verifica se a resposta da API indica que o usuário é válido

@@ -18,30 +18,6 @@ const Comodato = () => {
   const [selectedLocations, setSelectedLocations] = useState({});
   const [comodatoType, setComodatoType] = useState('proprietario'); // Novo estado para tipo de comodato
 
-  useEffect(() => {
-    const fetchSystemInfo = async () => {
-      try {
-        const response = await fetch('http://mao-s038:3001/api/system-info');
-        
-        if (!response.ok) {
-          throw new Error(`HTTP error! Status: ${response.status}`);
-        }
-        
-        const info = await response.json();
-        
-        setFormData(prevData => ({
-          ...prevData,
-          patrimonio: info.hostname,
-          usuario: info.accountName // Alterado de 'user' para 'usuario'
-        }));
-      } catch (error) {
-        console.error('Failed to fetch system info:', error);
-      }
-    };
-
-    fetchSystemInfo();
-  }, []);
-
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({
@@ -104,7 +80,7 @@ const Comodato = () => {
         return;
       }
 
-      const response = await fetch('http://mao-s038:3003/comodato', {
+      const response = await fetch('http://mao-s038:3003/comodatointer', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -235,7 +211,6 @@ const Comodato = () => {
               name="patrimonio"
               value={formData.patrimonio}
               onChange={handleChange}
-              readOnly
             />
           </div>
           <div className="form-group">
@@ -245,7 +220,7 @@ const Comodato = () => {
               id="usuario"
               name="usuario"
               value={formData.usuario}
-              readOnly
+              onChange={handleChange}
             />
           </div>
           <div className="form-group agreement">

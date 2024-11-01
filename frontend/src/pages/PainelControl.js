@@ -16,7 +16,7 @@ const UserAccountApp = () => {
 
   const fetchUsers = async () => {
     try {
-      const response = await axios.get('https://localhost:5000/add-usuario');
+      const response = await axios.get('http://mao-s038:5000/add-usuario');
       setAccounts(response.data);
     } catch (error) {
       console.error(error);
@@ -29,7 +29,7 @@ const UserAccountApp = () => {
 
   const handleAddAccount = async () => {
     try {
-      const response = await axios.post('https://localhost:5000/usuarios', {
+      const response = await axios.post('http://mao-s038:5000/usuarios', {
         username,
         profile,
         fullName,

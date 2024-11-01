@@ -8,6 +8,7 @@ import PainelControl from './pages/PainelControl'
 import './styles/App.css';
 import Comodato from './pages/Comodato';
 import Home from './pages/Home';
+import ComodatoInter from './pages/ComodatoInter';
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
         <Route path="/portal/licencas" element={<Licencas />} />
         <Route path="/portal/inventario" element={<Estoque />} />
         <Route path="/portal/comodato" element={<Comodato/>}/>
+        <Route path="/portal/comodato" element={<ComodatoInter/>}/>
         <Route path="/portal/painel" element={<Painel/>}/>
       </Routes>
     </Router>
