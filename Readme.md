@@ -1,4 +1,4 @@
-## 💻 Sistema Web Complexo (Sugestão)
+## 💻 Sistema de Inventário
 
 Este projeto representa um sistema web completo, com backend, frontend e autenticação, utilizando JavaScript. A estrutura sugere um controle de estoque, comodato e licenciamento, possivelmente integrado com o Office 365.
 
@@ -19,12 +19,10 @@ Este projeto é dividido em frontend e backend, com um sistema de autenticação
 Contém a lógica do servidor, banco de dados e autenticação.
 
 - 📁 Authentication/: Responsável pela autenticação dos usuários.
-    - `.env`: Arquivo de variáveis de ambiente.
     - `Authentication.js`: Lógica da autenticação.
     - `package-lock.json`, `package.json`: Gerenciamento de dependências.
     - `SystemInfo.js`:  Provavelmente coleta informações do sistema.
 - 📁 DB/:  Interação com o banco de dados.
-    - `.env`: Arquivo de variáveis de ambiente.
     - `package-lock.json`, `package.json`: Gerenciamento de dependências.
     - `server.js`:  Servidor do banco de dados.
 - 📁 serviço/: Lógica de serviço, possivelmente background tasks ou service workers.
@@ -78,14 +76,8 @@ Interface do usuário construída com React.
 - `.vscodeignore`: Define arquivos e pastas ignorados pelo VS Code.
 - `CHANGELOG.md`: Histórico de mudanças do projeto.
 - `package-lock.json`, `package.json`: Gerenciamento de dependências do projeto (raiz).
-- `README.md`: Este arquivo!
 
 
-## Próximos passos
 
-- Adicionar instruções de instalação e execução.
-- Detalhar a API REST e seus endpoints.
-- Incluir informações sobre o banco de dados utilizado.
-- Descrever o processo de autenticação.
 
 
