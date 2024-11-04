@@ -8,24 +8,22 @@ import Licencas from './pages/Licencas';
 import Estoque from './pages/Estoque';
 import Comodato from './pages/Comodato';
 import PainelControl from './pages/PainelControl';
-import Comodatointer from './pages/ComodatoInter'
+import Comodatointer from './pages/ComodatoInter';
 
 import './styles/App.css';
-
 
 const Layout = ({ children }) => {
   const location = useLocation();
   const isLoginPage = location.pathname === '/';
-  const isComodatoPage = location.pathname === '/portal/comodato'; 
-  const isComodatoInterPage = location.pathname === '/portal/comodatointer'; // Verifica se está na página ComodatoInter
 
   return (
     <div className="app-container">
-      {/* Exibe a NavBar se não estiver na página de login ou em comodato */}
-      {!isLoginPage && !isComodatoPage && !isComodatoInterPage && <NavBar />}
+      {/* Exibe a NavBar se não estiver na página de login */}
+      {!isLoginPage && <NavBar />}
       <div className="content-container">
         {children}
       </div>
+      {/* Exibe o Footer em todas as páginas, exceto a de login */}
       <Footer />
     </div>
   );
@@ -36,7 +34,7 @@ function App() {
     <Router>
       <Routes>
         <Route path="/" element={<Layout><Login /></Layout>} />
-        <Route path="portal/Home" element={<Layout><Home /></Layout>} />
+        <Route path="/portal/Home" element={<Layout><Home /></Layout>} />
         <Route path="/portal/licencas" element={<Layout><Licencas /></Layout>} />
         <Route path="/portal/inventario" element={<Layout><Estoque /></Layout>} />
         <Route path="/portal/comodato" element={<Layout><Comodato /></Layout>} />

@@ -335,6 +335,7 @@ app.get('/comodato/pdf/:patrimonio', async (req, res) => {
 });
 
 
+// Rota para adicionar inventário
 app.post('/inventario', async (req, res) => {
   try {
     const {
@@ -345,22 +346,17 @@ app.post('/inventario', async (req, res) => {
       garantia, comodato, criadoPor, datanextDesmobilizado, Observacao, ChamadoSolicitacao
     } = req.body;
 
-    if (!pool) {
-      console.error('Pool de conexão não disponível.');
-      return res.status(500).json({ message: 'Erro na conexão com o banco de dados.' });
-    }
-
+    // Verificação de campos obrigatórios
     if (!patrimonio || !empresa || !setor || !centroDeCusto || !tipo || !marca || !modelo) {
       return res.status(400).json({ message: 'Erro: Campos obrigatórios não preenchidos.' });
     }
 
     const comodatoBool = comodato === 'Sim' ? 'Sim' : 'Não';
 
+    // Verificar se o patrimônio já existe
     const existeRequest = new mssql.Request(pool);
-    const existeQuery = `
-      SELECT * FROM controleInventario WHERE patrimonio = @patrimonio;
-    `;
     existeRequest.input('patrimonio', mssql.VarChar, patrimonio);
+    const existeQuery = `SELECT * FROM controleInventario WHERE patrimonio = @patrimonio;`;
     const existe = await existeRequest.query(existeQuery);
 
     if (existe.recordset.length > 0) {
@@ -369,68 +365,7 @@ app.post('/inventario', async (req, res) => {
 
     const request = new mssql.Request(pool);
     
-    // Inicializa arrays para os campos e valores
-    const fields = [
-      'patrimonio', 'empresa', 'setor', 'centroDeCusto', 'tipo', 
-      'marca', 'modelo', 'office', 'compartilhada', 'usuarios', 
-      'planta', 'tipoCompra', 'fornecedor', 'nf', 'valorUnitario', 
-      'garantia', 'comodato', 'criadoPor', 'dataNextDesmobilizado', 'Observacao', 'ChamadoSolicitacao'
-    ];
-    const values = [
-      '@patrimonio', '@empresa', '@setor', '@centroDeCusto', '@tipo', 
-      '@marca', '@modelo', '@office', '@compartilhada', '@usuarios', 
-      '@planta', '@tipoCompra', '@fornecedor', '@nf', '@valorUnitario', 
-      '@garantia', '@comodato', '@criadoPor', '@dataNextDesmobilizado', '@Observacao', '@ChamadoSolicitacao'
-    ];
-
-    // Adiciona campos de data se estiverem presentes
-    if (dataNf) {
-      fields.push('dataNf');
-      values.push('@dataNf');
-    }
-
-    if (dataRecebimento) {
-      fields.push('dataRecebimento');
-      values.push('@dataRecebimento');
-    }
-
-    if (dataEntradaFiscal) {
-      fields.push('dataEntradaFiscal');
-      values.push('@dataEntradaFiscal');
-    }
-
-    if (dataNext) {
-      fields.push('dataNext');
-      values.push('@dataNext');
-    }
-
-    if (chamadoFiscal) {
-      fields.push('chamadoFiscal');
-      values.push('@chamadoFiscal');
-    }
-
-    if (chamadoNext) {
-      fields.push('chamadoNext');
-      values.push('@chamadoNext');
-    }
-
-    if (entradaContabil) {
-      fields.push('entradaContabil');
-      values.push('@entradaContabil');
-    }
-
-    if (dataNextDesmobilizado) {
-      fields.push('dataNextDesmobilizado');
-      values.push('@dataNextDesmobilizado');
-    }
-
-    // Constrói a consulta SQL dinamicamente
-    const query = `
-      INSERT INTO controleInventario (${fields.join(', ')})
-      VALUES (${values.join(', ')});
-    `;
-
-    // Adiciona parâmetros à consulta
+    // Adicionando campos obrigatórios
     request.input('patrimonio', mssql.VarChar, patrimonio);
     request.input('empresa', mssql.VarChar, empresa);
     request.input('setor', mssql.VarChar, setor);
@@ -450,6 +385,7 @@ app.post('/inventario', async (req, res) => {
     request.input('comodato', mssql.VarChar, comodatoBool);
     request.input('criadoPor', mssql.VarChar, criadoPor);
 
+    // Adicionando campos opcionais
     if (dataNf) {
       request.input('dataNf', mssql.Date, new Date(dataNf));
     }
@@ -479,17 +415,29 @@ app.post('/inventario', async (req, res) => {
     }
 
     if (datanextDesmobilizado) {
-      request.input('dataNextDesmobilizado', mssql.Date, new Date(datanextDesmobilizado));
+      request.input('dataNextDesmobilizado ', mssql.Date, new Date(datanextDesmobilizado));
     }
 
     if (Observacao) {
-      request.input ('Observacao', mssql.VarChar, Observacao);
+      request.input('Observacao', mssql.VarChar, Observacao);
     }
 
     if (ChamadoSolicitacao) {
       request.input('ChamadoSolicitacao', mssql.VarChar, ChamadoSolicitacao);
     }
-    
+
+    const query = `
+      INSERT INTO controleInventario (
+        patrimonio, empresa, setor, centroDeCusto, tipo, marca, modelo,
+        office, compartilhada, usuarios, planta, tipoCompra, fornecedor,
+        nf, valorUnitario, garantia, comodato, criadoPor, dataCriacao
+      ) VALUES (
+        @patrimonio, @empresa, @setor, @centroDeCusto, @tipo, @marca,
+        @modelo, @office, @compartilhada, @usuarios, @planta, @tipoCompra,
+        @fornecedor, @nf, @valorUnitario, @garantia, @comodato, @criadoPor, GETDATE()
+      );
+    `;
+
     await request.query(query);
 
     res.json({ message: 'Inventário adicionado com sucesso!' });
@@ -530,14 +478,7 @@ app.put('/inventario/:Patrimonio', async (req, res) => {
     request.input('tipoCompra', mssql.VarChar, tipoCompra);
     request.input('fornecedor', mssql.VarChar, fornecedor);
     request.input('nf', mssql.VarChar, nf);
-    request.input('dataNf', mssql.Date, new Date(dataNf));
     request.input('valorUnitario', mssql.Decimal, valorUnitario);
-    request.input('dataRecebimento', mssql.Date, new Date(dataRecebimento));
-    request.input('chamadoFiscal', mssql.VarChar, chamadoFiscal);
-    request.input('dataEntradaFiscal', mssql.Date, new Date(dataEntradaFiscal));
-    request.input('chamadoNext', mssql.VarChar, chamadoNext);
-    request.input('dataNext', mssql.Date, new Date(dataNext));
-    request.input('entradaContabil', mssql.VarChar, entradaContabil);
     request.input('garantia', mssql.VarChar, garantia);
     const comodatoBool = comodato === 'Sim' ? 'Sim' : 'Não';
     request.input('comodato', mssql.VarChar, comodatoBool);
@@ -578,7 +519,7 @@ app.put('/inventario/:Patrimonio', async (req, res) => {
         dataNf = @dataNf,
         dataRecebimento = @dataRecebimento,
         chamadoFiscal = @chamadoFiscal,
- dataEntradaFiscal = @dataEntradaFiscal,
+        dataEntradaFiscal = @dataEntradaFiscal,
         chamadoNext = @chamadoNext,
         dataNext = @dataNext,
         entradaContabil = @entradaContabil,
